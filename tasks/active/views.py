@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from rest_framework import viewsets
-from rest_framework import permissions
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .serializers import ActiveTasksSerializer
@@ -8,10 +8,9 @@ from .models import ActiveTasks
 
 # Create your views here.
 
-class ActiveTasksViewSet(viewsets.ModelViewSet):
-    serializer_class = ActiveTasksSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    http_method_names = ('get',)
-
-    def get_queryset(self):
-        return ActiveTasks.objects.filter(owner=self.request.user)
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+def active_tasks_view(request):
+    active_tasks, created = ActiveTasks.objects.get_or_create(owner=request.user)
+    serializers = ActiveTasksSerializer(active_tasks)
+    return Response(serializers.data)

@@ -6,18 +6,6 @@ from django.dispatch import receiver
 from .models import ActiveTasks
 from tasks.models import Task
 
-# On user create and delete signals
-
-@receiver(post_save, sender=get_user_model())
-def create_active_tasks_instance(sender, instance, created, **kwargs):
-    if created:
-        ActiveTasks.objects.create(owner=instance)
-
-
-@receiver(post_delete, sender=get_user_model())
-def delete_active_tasks_instance(sender, instance, **kwargs):
-    ActiveTasks.objects.filter(pk=instance.pk).delete()
-
 
 # On task create, update and delete signals
 
