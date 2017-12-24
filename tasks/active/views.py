@@ -14,15 +14,23 @@ class ActiveTasksView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
+        """
+        Get active tasks with the orders
+
+        """
         active_tasks, created = ActiveTasks.objects \
                                         .get_or_create(owner=request.user)
         serializer = OrderedTasksSerializer({
-            'tasks': Task.objects.filter(owner=request.user),
+            'tasks': Task.objects.filter(owner=request.user, completed=False),
             'active_tasks': active_tasks,
         })
         return Response(serializer.data)
 
     def post(self, request):
+        """
+        Create task with it's order and return changed orders
+
+        """
         serializer = OrderedTaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)

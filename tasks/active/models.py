@@ -8,7 +8,7 @@ class ActiveTasks(models.Model):
     owner = models.OneToOneField(get_user_model(),
                                  related_name='active_tasks',
                                  on_delete=models.CASCADE)
-    goals = JSONField(default=[])
-    progress = JSONField(default=[])
-    activities = JSONField(default=[])
-    interruptions = JSONField(default=[])
+    goals = JSONField(default=[])  # Orders of tasks with 1 priority
+    progress = JSONField(default=[])  # Orders of tasks with 2 priority
+    activities = JSONField(default=[])  # Orders of tasks with 3 priority
+    interruptions = JSONField(default=[])  # Orders of tasks with 4 priority

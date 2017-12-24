@@ -6,11 +6,14 @@ from django.dispatch import receiver
 from .models import ActiveTasks
 from tasks.models import Task
 
-
 # On task create, update and delete signals
 
 @receiver(post_save, sender=Task)
 def update_active_tasks_orders_on_create(sender, instance, created, **kwargs):
+    """
+    Add task id to active tasks
+
+    """
     if created and not instance.completed:
         active_tasks = ActiveTasks.objects.get(owner=instance.owner)
         preferences = {
@@ -25,6 +28,11 @@ def update_active_tasks_orders_on_create(sender, instance, created, **kwargs):
 
 @receiver(pre_save, sender=Task)
 def update_active_tasks_orders_on_change(sender, instance, **kwargs):
+    """
+    If task completed then delete task id from active tasks
+    If task priority changed then make changes in active tasks
+
+    """
     task = None
     try:
         task = sender.objects.get(pk=instance.pk)
@@ -56,6 +64,10 @@ def update_active_tasks_orders_on_change(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=Task)
 def update_active_tasks_orders_on_delete(sender, instance, **kwargs):
+    """
+    If task deleted then delete it's id from active tasks
+
+    """
     if not instance.completed: # If task is not completed, then delete its order as well
         active_tasks = ActiveTasks.objects.get(owner=instance.owner)
         preferences = {
