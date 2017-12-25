@@ -38,17 +38,17 @@ class OrderedTaskSerializer(serializers.Serializer):
         task = Task.objects.create(**validated_data['task'], owner=user)
         actions = ActiveTasksActions(task)
         active_tasks = actions.get_active_tasks()
-        if 'new_position' in validated_data:
+        instance = {}
+        if not task.completed and 'new_position' in validated_data:
             last_pos = actions.next_position() - 1
             new_position = validated_data['new_position']
             if (new_position >= 0 and new_position <= last_pos):
                 active_tasks = actions.to_positon(new_position) \
                                       .commit_and_get_active_tasks_instance()
-        return {
-            'new_position': actions.get_position(),
-            'task': task,
-            'active_tasks': active_tasks,
-        }
+            instance['new_position'] = new_position
+        instance['task'] = task
+        instance['active_tasks'] = active_tasks
+        return instance
 
     def update(self, instance, validated_data):
         task = instance['task']
