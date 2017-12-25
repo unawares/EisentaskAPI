@@ -14,14 +14,18 @@ class ActiveTasksActions:
         """
         pass
 
-    def __init__(self, instance):  # Takes task instance
+    def __init__(self, instance, active_tasks=None):  # Takes task instance
         """
         Constructor: takes one argument if task instance
         Retrives active tasks instance from given task
 
         """
+        if active_tasks is None:
+            active_tasks = ActiveTasks.objects.get(owner=instance.owner)
+        else:
+            active_tasks.refresh_from_db()
         self.instance = instance
-        self.active_tasks = ActiveTasks.objects.get(owner=instance.owner)
+        self.active_tasks = active_tasks
         self.preferences = {
             1: self.active_tasks.goals,
             2: self.active_tasks.progress,

@@ -11,6 +11,11 @@ from tasks.models import Task
 # Create your views here.
 
 class ActiveTasksView(APIView):
+    """
+    List view
+    Get and post methods are allowed
+
+    """
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -34,4 +39,43 @@ class ActiveTasksView(APIView):
         serializer = OrderedTaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
+        return Response(serializer.data)
+
+
+class ActiveTasksDetailView(APIView):
+    """
+    Detail view
+    Get, put and delete methods are allowed
+
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        task = Task.objects.get(pk=pk, owner=request.user)
+        active_tasks = ActiveTasks.objects.get(owner=request.user)
+        serializer = OrderedTaskSerializer({
+            'task': task,
+            'active_tasks': active_tasks,
+        })
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        task = Task.objects.get(pk=pk, owner=request.user)
+        active_tasks = ActiveTasks.objects.get(owner=request.user)
+        serializer = OrderedTaskSerializer({
+            'task': task,
+            'active_tasks': active_tasks,
+        }, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        task = Task.objects.get(pk=pk, owner=request.user)
+        task.delete()
+        active_tasks = ActiveTasks.objects.get(owner=request.user)
+        serializer = OrderedTaskSerializer({
+            'task': task,
+            'active_tasks': active_tasks,
+        })
         return Response(serializer.data)
