@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'tasks',
     'tasks.active',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -100,6 +101,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ),
 }
+
+CSRF_COOKIE_NAME = "csrftoken"
 
 
 # Database
