@@ -11,5 +11,6 @@ router.register(r'', TaskViewSet, base_name='Task')
 app_name = 'tasks'
 urlpatterns = [
     path(r'active/', include('tasks.active.urls', namespace='active')),
+    path(r'completed/', include('tasks.completed.urls', namespace='completed')),
     path(r'', include(router.urls)),
 ]

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'tasks',
     'tasks.active',
+    'tasks.completed',
     'dashboard',
 ]
 
