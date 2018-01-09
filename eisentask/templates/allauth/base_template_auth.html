@@ -1,0 +1,28 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block head %}
+  {{ block.super }}
+  <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <link href="{% static 'allauth/css/style.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+  <div id="app">
+    <v-app style="background-color: inherit">
+      <main class="main">
+        <div class="content">
+          <div class="spacer"></div>
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+    </v-app>
+  </div>
+{% endblock %}
+
+{% block body_additions %}
+  {{ block.super }}
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+  <script src="{% static 'allauth/js/index.js' %}"></script>
+{% endblock %}

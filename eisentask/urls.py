@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
@@ -27,11 +28,13 @@ api_patterns = [
 ]
 
 web_patterns = [
+    path(r'', include('headpage.urls', namespace='headpage')),
     path(r'dashboard/', include('dashboard.urls', namespace='dashboard')),
     path(r'accounts/', include('allauth.urls')),
 ]
 
 urlpatterns = [
+    path(r'', RedirectView.as_view(pattern_name='headpage:main', permanent=False)),
     path(r'admin/', admin.site.urls),
     path(r'api/', include(api_patterns)),
     path(r'web/', include(web_patterns)),

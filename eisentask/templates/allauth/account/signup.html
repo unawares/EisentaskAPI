@@ -1,0 +1,76 @@
+{% extends 'allauth/account/base_template_auth_signin_signup.html' %}
+{% load static %}
+
+{% block signup_item_class %}{{ block.super }} active{% endblock %}
+
+{% block auth %}
+  <form method="post">
+    {% csrf_token %}
+    {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    {% with form.username as field %}
+      <v-text-field
+        name="username"
+        prepend-icon="account_circle"
+        label="{{ field.field.widget.attrs.placeholder }}"
+        :error-messages="usernameErrorMessages"
+        v-model="username"
+        clearable
+        counter
+        dark >
+        <div v-once>
+          {% if field.value %}
+            [[ username = '{{ field.value }}' ]]
+          {% endif %}
+          {% if field.errors %}
+            [[ usernameErrorMessages = [{% for error in field.errors %}'* {{ error }}',{% endfor %}] ]]
+          {% endif %}
+        </div>
+      </v-text-field>
+    {% endwith %}
+    {% with form.password1 as field %}
+      <v-text-field
+        name="password1"
+        prepend-icon="vpn_key"
+        label="{{ field.field.widget.attrs.placeholder }}"
+        :error-messages="passwordErrorMessages"
+        v-model="password"
+        min="8"
+        :append-icon="passwordVisibility ? 'visibility' : 'visibility_off'"
+        :append-icon-cb="() => (passwordVisibility = !passwordVisibility)"
+        :type="passwordVisibility ? 'password' : 'text'"
+        counter
+        dark >
+        <div v-once>
+          {% if field.errors %}
+            [[ passwordErrorMessages = [{% for error in field.errors %}'* {{ error }}',{% endfor %}] ]]
+          {% endif %}
+        </div>
+        </v-text-field>
+    {% endwith %}
+    {% with form.email as field %}
+      <v-text-field
+        name="email"
+        prepend-icon="mail"
+        label="{{ field.field.widget.attrs.placeholder }}"
+        :error-messages="emailErrorMessages"
+        v-model="email"
+        clearable
+        dark >
+        <div v-once>
+          {% if field.value %}
+            [[ email = '{{ field.value }}' ]]
+          {% endif %}
+          {% if field.errors %}
+            [[ emailErrorMessages = [{% for error in field.errors %}'* {{ error }}',{% endfor %}] ]]
+          {% endif %}
+        </div>
+      </v-text-field>
+    {% endwith %}
+    <input type="hidden" name="password2" v-model="password"></input>
+    <div style="text-align: center">
+      <input type="submit" class="button" value="SIGN UP"></input>
+    </div>
+  </form>
+{% endblock %}

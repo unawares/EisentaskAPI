@@ -1,0 +1,21 @@
+{% extends 'allauth/base_template_auth.html' %}
+{% load static %}
+
+{% block content %}
+  <header class="header">
+    <img src="{% static 'assets/logo.svg' %}">
+    <ul class="auth-tabs">
+      <li class="{% block signin_item_class %}auth-item{% endblock %}">
+        <a href="{% url 'account_login' %}">SIGN IN</a>
+      </li>
+      <li class="{% block signup_item_class %}auth-item{% endblock %}">
+        <a href="{% url 'account_signup' %}">SIGN UP</a>
+      </li>
+    </ul>
+  </header>
+  <main class="authentication">
+    <section class="auth">
+      {% block auth %}{% endblock %}
+    </section>
+  </main>
+{% endblock %}

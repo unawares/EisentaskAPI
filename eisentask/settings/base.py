@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import datetime
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,6 +28,9 @@ SECRET_KEY = '%fn4g*o%m+l2fztz&e&-b)$k!qom)p2v7x+(nirw_d9foex66u'
 # Application definition
 
 INSTALLED_APPS = [
+    'material',
+    'material.frontend',
+    'material.admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +48,7 @@ INSTALLED_APPS = [
     'tasks.active',
     'tasks.completed',
     'dashboard',
+    'headpage',
 ]
 
 MIDDLEWARE = [
@@ -61,7 +66,10 @@ ROOT_URLCONF = 'eisentask.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'templates', 'allauth'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -105,6 +113,9 @@ REST_FRAMEWORK = {
 
 CSRF_COOKIE_NAME = "csrftoken"
 
+LOGIN_URL = reverse_lazy('account_login')
+LOGIN_REDIRECT_URL = reverse_lazy('dashboard:main')
+LOGOUT_REDIRECT_URL = reverse_lazy('headpage:main')
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -154,7 +165,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join('static/')
+
+STATICFILES_DIRS = [
+  os.path.join(BASE_DIR, 'static/'),
+]
 
 
 # Site settings

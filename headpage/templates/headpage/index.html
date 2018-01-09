@@ -1,0 +1,26 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block head_additions %}
+  <link href="{% static 'headpage/css/style.css' %}" rel="stylesheet" type="text/css">
+  <script src="{% static 'headpage/js/index.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="introduction">
+    <div class="intro">
+      <img class="logo" src="{% static 'assets/logo.svg' %}">
+      <div class="main-text">
+        <div class="header">
+          <span class="text">Eisentask.com</span>
+        </div>
+        <div class="content">
+          <span class="text">Entry and achieve your goals</span>
+        </div>
+        <div class="get-started">
+          <a class="get-started-button" href="{% url 'account_login' %}">GET STARTED</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,61 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  padding: 0;
+  margin: 0;
+  background-color: #263238;
+}
+.get-started-button {
+  color: #ffc107;
+  border: solid 2px #ffc107;
+  text-decoration: none;
+  padding: 7px 14px;
+  font-size: 2.5vw;
+  margin: 20px;
+  border-radius: 30px;
+  transition: all ease-out 0.15s;
+  cursor: pointer;
+  display: inline-block;
+}
+@media screen and (min-width: 800px) {
+  .get-started-button {
+    font-size: 20px;
+  }
+}
+.get-started-button:hover {
+  background-color: #ffc107;
+  color: #fff;
+}
+.introduction {
+  width: 100%;
+  min-height: 500px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.introduction .intro {
+  width: 600px;
+  max-width: 85vw;
+}
+.introduction .intro .main-text {
+  color: #fff;
+  text-align: center;
+}
+.introduction .intro .main-text .header .text {
+  font-weight: 400;
+  font-size: 10.5vw;
+}
+@media screen and (min-width: 800px) {
+  .introduction .intro .main-text .header .text {
+    font-size: 85px;
+  }
+}
+.introduction .intro .main-text .content .text {
+  font-weight: 300;
+  font-size: 3.8vw;
+}
+@media screen and (min-width: 800px) {
+  .introduction .intro .main-text .content .text {
+    font-size: 30px;
+  }
+}
