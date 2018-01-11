@@ -28,9 +28,6 @@ SECRET_KEY = '%fn4g*o%m+l2fztz&e&-b)$k!qom)p2v7x+(nirw_d9foex66u'
 # Application definition
 
 INSTALLED_APPS = [
-    'material',
-    'material.frontend',
-    'material.admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

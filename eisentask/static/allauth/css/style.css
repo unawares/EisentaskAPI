@@ -56,7 +56,7 @@ body {
   -moz-transition: all ease 200ms;
   transition: all ease 200ms;
   z-index: -1;
-  bottom: -100%;
+  bottom: -120%;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -74,7 +74,7 @@ body {
   color: #ffc107;
 }
 .main .content .header .auth-tabs:hover .auth-item:before {
-  bottom: -100%;
+  bottom: -120%;
 }
 .main .content .header .auth-tabs .auth-item:hover {
   color: #fff;

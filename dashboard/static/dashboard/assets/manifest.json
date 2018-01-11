@@ -1,19 +1,19 @@
 {
-  "name": "eisentask_web",
+  "name": "Eisentask",
   "short_name": "eisentask",
   "icons": [
     {
-      "src": "img/icons/android-chrome-192x192.png",
+      "src": "/static/assets/img/icons/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "img/icons/android-chrome-512x512.png",
+      "src": "/static/assets/img/icons/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
-  "start_url": "/index.html",
+  "start_url": "/web/",
   "display": "standalone",
   "background_color": "#263238",
   "theme_color": "#FFC107"
