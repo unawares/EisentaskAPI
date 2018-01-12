@@ -13,6 +13,7 @@ body {
 .main .content {
   width: 60vw;
   max-width: 360px;
+  padding: 16px;
 }
 .main .content .spacer {
   height: 16vw;
