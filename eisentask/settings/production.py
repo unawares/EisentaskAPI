@@ -11,7 +11,7 @@ settings = SettingsFile('../eisentask_config.json')
 
 # Allowed hosts
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['eisentask.com']
 
 
 # Database
