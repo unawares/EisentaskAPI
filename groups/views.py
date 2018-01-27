@@ -1,14 +1,19 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework import status
+from rest_framework.decorators import detail_route
 from .models import MemberCard
 from .models import Group
 from .serializers import MemberCardSerializer
 from .serializers import GroupSerializer
+from .serializers import UsernameOrEmailSerializer
 from .paginations import GroupsSetPagination
+from .permissions import GroupAdminAccessPermission
+from .actions import GroupAdminActions
 
 # Create your views here.
 
@@ -26,6 +31,20 @@ class MyGroupViewSet(viewsets.ModelViewSet):
         serializer.save(admin=request.user)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
+    def add(self, request, pk=None):
+        group = get_object_or_404(Group, pk=pk, admin=self.request.user)
+        admin = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(get_user_model(),
+            Q(username=serializer.data['username_or_email'])
+            | Q(email=serializer.data['username_or_email'])
+        )
+        GroupAdminActions(admin, group).actions_with(user).create_member_card()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
 
 
 class MyMemberCardViewSet(viewsets.ReadOnlyModelViewSet):
@@ -58,14 +77,12 @@ class GroupMemberCardViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_group_instance(self, group_pk=None):
         if self.request.user.is_authenticated:
-            return get_object_or_404(Group,
-                (Q(is_public=True) & Q(pk=group_pk))
-                | (Q(member_cards__owner=self.request.user) & Q(pk=group_pk))
-            )
+            groups = Group.objects.filter(
+                Q(is_public=True) | Q(member_cards__owner=self.request.user))
         else:
-            return get_object_or_404(Group,
-                (Q(is_public=True) & Q(pk=group_pk))
-            )
+            groups = Group.objects.filter(is_public=True)
+        return get_object_or_404(groups, pk=group_pk)
+
 
     def get_queryset(self):
         try:

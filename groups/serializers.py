@@ -22,3 +22,7 @@ class MemberCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberCard
         fields = '__all__'
+
+
+class UsernameOrEmailSerializer(serializers.Serializer):
+    username_or_email = serializers.CharField(max_length=150, required=True)
