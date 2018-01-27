@@ -22,7 +22,7 @@ class GroupAdminActions:
                 raise GroupAdminActionsError('User must be member of the group')
             return member_card
 
-        def create_member_card(self):
+        def add(self):
             member_card, created = MemberCard.objects.get_or_create(
                 group = self.group,
                 owner = self.user,

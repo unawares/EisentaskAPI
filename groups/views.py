@@ -34,7 +34,7 @@ class MyGroupViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
     def add(self, request, pk=None):
-        group = get_object_or_404(Group, pk=pk, admin=self.request.user)
+        group = get_object_or_404(self.get_queryset(), pk=pk)
         admin = self.request.user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -42,7 +42,7 @@ class MyGroupViewSet(viewsets.ModelViewSet):
             Q(username=serializer.data['username_or_email'])
             | Q(email=serializer.data['username_or_email'])
         )
-        GroupAdminActions(admin, group).actions_with(user).create_member_card()
+        GroupAdminActions(admin, group).actions_with(user).add()
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, headers=headers)
 
