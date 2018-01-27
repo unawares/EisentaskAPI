@@ -6,17 +6,18 @@ from .strings import LABEL_GOALS, LABEL_PROGRESS, LABEL_ACTIVITIES, LABEL_INTERR
 
 # Create your models here.
 
-class Task(models.Model):
-    PRIORITY_CHOICES = (
-        (1, LABEL_GOALS),
-        (2, LABEL_PROGRESS),
-        (3, LABEL_ACTIVITIES),
-        (4, LABEL_INTERRUPTIONS),
-    )
+PRIORITY_CHOICES = (
+    (1, LABEL_GOALS),
+    (2, LABEL_PROGRESS),
+    (3, LABEL_ACTIVITIES),
+    (4, LABEL_INTERRUPTIONS),
+)
 
+
+class Task(models.Model):
     owner = models.ForeignKey(get_user_model(),
                               related_name='tasks',
-                              on_delete=models.CASCADE,)
+                              on_delete=models.CASCADE)
     text = models.TextField()
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)

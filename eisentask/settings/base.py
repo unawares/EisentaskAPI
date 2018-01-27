@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_auth',
     'rest_auth.registration',
+    'groups',
     'tasks',
     'tasks.active',
     'tasks.completed',
+    'group_tasks',
     'dashboard',
     'headpage',
 ]

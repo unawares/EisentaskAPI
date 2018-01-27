@@ -21,6 +21,8 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 api_patterns = [
     path(r'tasks/', include('tasks.urls', namespace='tasks')),
+    path(r'group_tasks/', include('group_tasks.urls', namespace='group_tasks')),
+    path(r'groups/', include('groups.urls', namespace='groups')),
     path(r'auth/', include('rest_auth.urls')),
     path(r'auth/registration/', include('rest_auth.registration.urls')),
     path(r'token-auth/', obtain_jwt_token),
