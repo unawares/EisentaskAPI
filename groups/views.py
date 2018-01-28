@@ -46,6 +46,62 @@ class MyGroupViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, headers=headers)
 
+    @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
+    def remove(self, request, pk=None):
+        group = get_object_or_404(self.get_queryset(), pk=pk)
+        admin = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(get_user_model(),
+            Q(username=serializer.data['username_or_email'])
+            | Q(email=serializer.data['username_or_email'])
+        )
+        GroupAdminActions(admin, group).actions_with(user).remove()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
+
+    @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
+    def make_staff(self, request, pk=None):
+        group = get_object_or_404(self.get_queryset(), pk=pk)
+        admin = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(get_user_model(),
+            Q(username=serializer.data['username_or_email'])
+            | Q(email=serializer.data['username_or_email'])
+        )
+        GroupAdminActions(admin, group).actions_with(user).make_user_staff()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
+
+    @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
+    def remove_staff(self, request, pk=None):
+        group = get_object_or_404(self.get_queryset(), pk=pk)
+        admin = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(get_user_model(),
+            Q(username=serializer.data['username_or_email'])
+            | Q(email=serializer.data['username_or_email'])
+        )
+        GroupAdminActions(admin, group).actions_with(user).remove_staff_from_user()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
+
+    @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
+    def make_admin(self, request, pk=None):
+        group = get_object_or_404(self.get_queryset(), pk=pk)
+        admin = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(get_user_model(),
+            Q(username=serializer.data['username_or_email'])
+            | Q(email=serializer.data['username_or_email'])
+        )
+        GroupAdminActions(admin, group).actions_with(user).give_admin_priviligies()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
+
 
 class MyMemberCardViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = MemberCardSerializer

@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
 from .models import Group
 from .models import MemberCard
+from .exceptions import GroupAdminActionsError
+from .exceptions import GroupAdminActionsOnUserError
+from .exceptions import GroupAdminActionsNoMemberError
 
 class GroupAdminActions:
-    class GroupAdminActionsError(Exception):
-        pass
-
     class Actions:
         def __init__(self, admin, group, user):
             self.admin = admin
@@ -19,7 +19,7 @@ class GroupAdminActions:
                     owner = self.user,
                 )
             except MemberCard.DoesNotExist:
-                raise GroupAdminActionsError('User must be member of the group')
+                raise GroupAdminActionsNoMemberError()
             return member_card
 
         def add(self):
@@ -29,6 +29,11 @@ class GroupAdminActions:
             )
             member_card.is_staff = False
             member_card.save()
+
+        def remove(self):
+            member_card = MemberCard.objects.filter(group = self.group,
+                                                    owner = self.user,)
+            member_card.delete()
 
         def make_user_staff(self):
             member_card = self._get_member_card()
@@ -48,9 +53,11 @@ class GroupAdminActions:
 
     def __init__(self, admin, group):
         if not admin == group.admin:
-            raise GroupAdminActionsError('User does not have admin privileges.')
+            raise GroupAdminActionsError()
         self.admin = admin
         self.group = group
 
     def actions_with(self, user):
+        if self.admin == user:
+            raise GroupAdminActionsOnUserError()
         return GroupAdminActions.Actions(self.admin, self.group, user)
