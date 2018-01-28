@@ -132,7 +132,7 @@ class GroupMemberCardViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = GroupsSetPagination
     serializer_class = MemberCardSerializer
 
-    def get_group_instance(self, group_pk=None):
+    def _get_group_instance(self, group_pk=None):
         if self.request.user.is_authenticated:
             groups = Group.objects.filter(
                 Q(is_public=True) | Q(member_cards__owner=self.request.user))
@@ -146,5 +146,5 @@ class GroupMemberCardViewSet(viewsets.ReadOnlyModelViewSet):
             group_pk = int(self.kwargs['group_pk'])
         except ValueError:
             group_pk = None
-        group = self.get_group_instance(group_pk)
+        group = self._get_group_instance(group_pk)
         return group.member_cards.all()

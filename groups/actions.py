@@ -46,7 +46,9 @@ class GroupAdminActions:
             member_card.save()
 
         def give_admin_priviligies(self):
-            member_card = self._get_member_card()  # Call to check if user is a member
+            member_card = self._get_member_card()
+            member_card.is_staff = True
+            member_card.save()
             self.group.admin = self.user
             self.group.save()
 
