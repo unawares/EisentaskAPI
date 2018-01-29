@@ -138,6 +138,7 @@ class GroupMemberCardViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(is_public=True) | Q(member_cards__owner=self.request.user))
         else:
             groups = Group.objects.filter(is_public=True)
+        groups = groups.distinct()
         return get_object_or_404(groups, pk=group_pk)
 
 

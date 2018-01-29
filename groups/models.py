@@ -15,6 +15,9 @@ class Group(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ('created', 'updated',)
+
 
 class MemberCard(models.Model):
     group = models.ForeignKey(Group,
@@ -26,3 +29,5 @@ class MemberCard(models.Model):
     is_staff = models.BooleanField(default=False)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering = ('created', 'updated',)
