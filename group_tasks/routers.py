@@ -9,16 +9,35 @@ class GroupTasksRouter(SimpleRouter):
             initkwargs={'suffix': 'List'}
         ),
         Route(
-            url=r'^{prefix}/active/groups/(?P<group_id>\d+)/tasks/$',
-            mapping={'post': 'create_group_task'},
-            name='{basename}-list',
-            initkwargs={'suffix': 'Detail'}
-        ),
-        Route(
             url=r'^{prefix}/(?P<type>completed)/groups/(?P<group_id>\d+)/$',
             mapping={'get': 'list_completed_tasks'},
             name='{basename}-list-completed-tasks',
             initkwargs={'suffix': 'List'}
+        ),
+        Route(
+            url=r'^{prefix}/active/groups/(?P<group_id>\d+)/tasks/$',
+            mapping={'post': 'create_group_task'},
+            name='{basename}-list-active-tasks',
+            initkwargs={'suffix': 'Detail'}
+        ),
+        Route(
+            url=r'^{prefix}/active/groups/(?P<group_id>\d+)/tasks/{lookup}/$',
+            mapping={
+                'get': 'retrieve_active_group_task',
+                'put': 'update_active_group_task',
+                'delete': 'delete_active_group_task',
+            },
+            name='{basename}-detail',
+            initkwargs={'suffix': 'Detail'}
+        ),
+        Route(
+            url=r'^{prefix}/completed/groups/(?P<group_id>\d+)/tasks/{lookup}/$',
+            mapping={
+                'get': 'retrieve_completed_group_task',
+                'delete': 'delete_completed_group_task',
+            },
+            name='{basename}-detail',
+            initkwargs={'suffix': 'Detail'}
         ),
         Route(
             url=r'^{prefix}/(?P<type>completed)/groups/(?P<group_id>\d+)/dates/$',
@@ -43,11 +62,5 @@ class GroupTasksRouter(SimpleRouter):
             mapping={'get': 'list_completed_task_dates'},
             name='{basename}-list-completed-tasks',
             initkwargs={'suffix': 'List'}
-        ),
-        Route(
-            url=r'^{prefix}/(?P<type>(?:active)|(?:completed))/groups/(?P<group_id>\d+)/tasks/{lookup}/$',
-            mapping={'get': 'retrieve'},
-            name='{basename}-detail',
-            initkwargs={'suffix': 'Detail'}
         ),
     ]

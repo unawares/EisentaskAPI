@@ -12,6 +12,7 @@ from groups.models import Group
 from groups.models import MemberCard
 from .models import GroupTask
 from .models import CompletedGroupTask
+from .models import SharedTask
 from .serializers import GroupTaskSerializer
 from .serializers import CompletedGroupTaskSerializer
 from .paginations import PrioritizedActiveTasksSetPagination
@@ -122,34 +123,131 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             results = [date for date in results if date.day == day]
         return Response(results)
 
-    def retrieve(self, request, type, group_id, pk):
-        if type == 'active':
+    def retrieve_active_group_task(self, request, group_id, pk):
+        group = self._get_group_instance(group_id)
+        if request.query_params.get('action') == 'complete' and request.user.is_authenticated:
+            member_card = get_object_or_404(
+                self.request.user.member_cards,
+                group=group,
+            )
+            group_task = GroupTask.objects.get(group=group, pk=pk)
+            try:
+                completed_group_task = CompletedGroupTask.objects.get(
+                    shared_task=group_task.shared_task,
+                    group=group,
+                    owner=self.request.user,
+                )
+                completed_group_task.priority = group_task.priority
+                completed_group_task.save()
+            except CompletedGroupTask.DoesNotExist:
+                completed_group_task = CompletedGroupTask.objects.create(
+                    shared_task=group_task.shared_task,
+                    group=group,
+                    owner=self.request.user,
+                    priority=group_task.priority,
+                )
+            serializer = self.completed_task_serializer_class(completed_group_task)
+        else:
             active_group_task = get_object_or_404(
-                self._get_queryset_active_group_tasks(group_id),
+                self._get_queryset_active_group_tasks(group),
                 pk=pk,
             )
             serializer = self.serializer_class(active_group_task)
-        elif type == 'completed' and request.user.is_authenticated:
-            member_card = get_object_or_404(
-                self.request.user.member_cards,
-                group=group_id,
-            )
-            completed_group_task = get_object_or_404(
-                self._get_queryset_completed_group_tasks(group_id),
-                pk=pk,
-            )
-            serializer = self.completed_task_serializer_class(completed_group_task)
         return Response(serializer.data)
 
-    def create_group_task(self, request, group_id):
+    def update_active_group_task(self, request, group_id, pk):
+        group = self._get_group_instance(group_id)
         member_card = get_object_or_404(
             self.request.user.member_cards,
-            group=group_id,
+            group=group,
         )
         if not member_card.is_staff:
             raise PermissionDenied({
                 'permission_denied': 'User is not permitted to create tasks.'
             })
-        serializer = GroupTaskSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        shared_task = SharedTask.objects.create(
+            creator=member_card.owner,
+            text=serializer.data['text'],
+        )
+        group_task = get_object_or_404(
+            self._get_queryset_active_group_tasks(group),
+            pk=pk,
+        )
+        group_task.shared_task.previous = shared_task
+        group_task.shared_task.save()
+        group_task.shared_task = shared_task
+        group_task.priority = serializer.data['priority']
+        group_task.save()
+        group_task.to(serializer.data['order'])
+        serializer = self.serializer_class(group_task)
+        return Response(serializer.data)
+
+    def delete_active_group_task(self, request, group_id, pk):
+        group = self._get_group_instance(group_id)
+        member_card = get_object_or_404(
+            self.request.user.member_cards,
+            group=group,
+        )
+        if not member_card.is_staff:
+            raise PermissionDenied({
+                'permission_denied': 'User is not permitted to create tasks.'
+            })
+        group_task = get_object_or_404(
+            self._get_queryset_active_group_tasks(group),
+            pk=pk,
+        )
+        group_task.delete()
+        serializer = self.serializer_class(group_task)
+        return Response(serializer.data)
+
+    def retrieve_completed_group_task(self, request, group_id, pk):
+        member_card = get_object_or_404(
+            self.request.user.member_cards,
+            group=group_id,
+        )
+        completed_group_task = get_object_or_404(
+            self._get_queryset_completed_group_tasks(group_id),
+            pk=pk,
+        )
+        serializer = self.completed_task_serializer_class(completed_group_task)
+        return Response(serializer.data)
+
+    def delete_completed_group_task(self, request, group_id, pk):
+        member_card = get_object_or_404(
+            self.request.user.member_cards,
+            group=group_id,
+        )
+        completed_group_task = get_object_or_404(
+            self._get_queryset_completed_group_tasks(group_id),
+            pk=pk,
+        )
+        completed_group_task.delete()
+        serializer = self.completed_task_serializer_class(completed_group_task)
+        return Response(serializer.data)
+
+    def create_group_task(self, request, group_id):
+        group = self._get_group_instance(group_id)
+        member_card = get_object_or_404(
+            self.request.user.member_cards,
+            group=group,
+        )
+        if not member_card.is_staff:
+            raise PermissionDenied({
+                'permission_denied': 'User is not permitted to create tasks.'
+            })
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        shared_task = SharedTask.objects.create(
+            creator=member_card.owner,
+            text=serializer.data['text'],
+        )
+        group_task = GroupTask.objects.create(
+            shared_task=shared_task,
+            group=group,
+            priority=serializer.data['priority'],
+        )
+        group_task.top()
+        serializer = self.serializer_class(group_task)
         return Response(serializer.data)

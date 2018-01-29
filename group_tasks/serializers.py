@@ -12,6 +12,7 @@ class SharedTaskSerializer(serializers.ModelSerializer):
 
 class GroupTaskSerializer(serializers.ModelSerializer):
     text = serializers.CharField(source='shared_task.text')
+    order = serializers.IntegerField(default=0)
     class Meta:
         model = GroupTask
         exclude = ('shared_task', 'group',)
