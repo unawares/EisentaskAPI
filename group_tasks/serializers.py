@@ -9,16 +9,17 @@ class SharedTaskSerializer(serializers.ModelSerializer):
         model = SharedTask
         fields = '__all__'
 
+
 class GroupTaskSerializer(serializers.ModelSerializer):
-    shared_task = SharedTaskSerializer(read_only=True)
+    text = serializers.CharField(source='shared_task.text')
     class Meta:
         model = GroupTask
-        fields = '__all__'
+        exclude = ('shared_task', 'group',)
+
 
 class CompletedGroupTaskSerializer(serializers.ModelSerializer):
-    shared_task = SharedTaskSerializer(read_only=True)
+    text = serializers.CharField(source='shared_task.text')
     class Meta:
         model = CompletedGroupTask
-        fields = '__all__'
-        read_only_fields = ('created', 'updated', 'owner',
-                            'group', 'priority', 'shared_task')
+        exclude = ('shared_task', 'group', 'owner',)
+        read_only_fields = ('created', 'updated', 'priority',)

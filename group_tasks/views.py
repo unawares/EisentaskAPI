@@ -7,6 +7,7 @@ from rest_framework import viewsets
 from rest_framework import mixins
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied
 from groups.models import Group
 from groups.models import MemberCard
 from .models import GroupTask
@@ -122,6 +123,33 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
         return Response(results)
 
     def retrieve(self, request, type, group_id, pk):
-        shared_task = get_object_or_404(self._get_queryset(), pk=pk)
-        serializer = self.serializer_class(shared_task)
+        if type == 'active':
+            active_group_task = get_object_or_404(
+                self._get_queryset_active_group_tasks(group_id),
+                pk=pk,
+            )
+            serializer = self.serializer_class(active_group_task)
+        elif type == 'completed' and request.user.is_authenticated:
+            member_card = get_object_or_404(
+                self.request.user.member_cards,
+                group=group_id,
+            )
+            completed_group_task = get_object_or_404(
+                self._get_queryset_completed_group_tasks(group_id),
+                pk=pk,
+            )
+            serializer = self.completed_task_serializer_class(completed_group_task)
+        return Response(serializer.data)
+
+    def create_group_task(self, request, group_id):
+        member_card = get_object_or_404(
+            self.request.user.member_cards,
+            group=group_id,
+        )
+        if not member_card.is_staff:
+            raise PermissionDenied({
+                'permission_denied': 'User is not permitted to create tasks.'
+            })
+        serializer = GroupTaskSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         return Response(serializer.data)
