@@ -125,34 +125,11 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
 
     def retrieve_active_group_task(self, request, group_id, pk):
         group = self._get_group_instance(group_id)
-        if request.query_params.get('action') == 'complete' and request.user.is_authenticated:
-            member_card = get_object_or_404(
-                self.request.user.member_cards,
-                group=group,
-            )
-            group_task = GroupTask.objects.get(group=group, pk=pk)
-            try:
-                completed_group_task = CompletedGroupTask.objects.get(
-                    shared_task=group_task.shared_task,
-                    group=group,
-                    owner=self.request.user,
-                )
-                completed_group_task.priority = group_task.priority
-                completed_group_task.save()
-            except CompletedGroupTask.DoesNotExist:
-                completed_group_task = CompletedGroupTask.objects.create(
-                    shared_task=group_task.shared_task,
-                    group=group,
-                    owner=self.request.user,
-                    priority=group_task.priority,
-                )
-            serializer = self.completed_task_serializer_class(completed_group_task)
-        else:
-            active_group_task = get_object_or_404(
-                self._get_queryset_active_group_tasks(group),
-                pk=pk,
-            )
-            serializer = self.serializer_class(active_group_task)
+        active_group_task = get_object_or_404(
+            self._get_queryset_active_group_tasks(group),
+            pk=pk,
+        )
+        serializer = self.serializer_class(active_group_task)
         return Response(serializer.data)
 
     def update_active_group_task(self, request, group_id, pk):
@@ -200,6 +177,31 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
         )
         group_task.delete()
         serializer = self.serializer_class(group_task)
+        return Response(serializer.data)
+
+    def complete_active_group_task(self, request, group_id, pk):
+        group = self._get_group_instance(group_id)
+        member_card = get_object_or_404(
+            self.request.user.member_cards,
+            group=group,
+        )
+        group_task = GroupTask.objects.get(group=group, pk=pk)
+        try:
+            completed_group_task = CompletedGroupTask.objects.get(
+                shared_task=group_task.shared_task,
+                group=group,
+                owner=self.request.user,
+            )
+            completed_group_task.priority = group_task.priority
+            completed_group_task.save()
+        except CompletedGroupTask.DoesNotExist:
+            completed_group_task = CompletedGroupTask.objects.create(
+                shared_task=group_task.shared_task,
+                group=group,
+                owner=self.request.user,
+                priority=group_task.priority,
+            )
+        serializer = self.completed_task_serializer_class(completed_group_task)
         return Response(serializer.data)
 
     def retrieve_completed_group_task(self, request, group_id, pk):

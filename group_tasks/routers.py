@@ -31,6 +31,14 @@ class GroupTasksRouter(SimpleRouter):
             initkwargs={'suffix': 'Detail'}
         ),
         Route(
+            url=r'^{prefix}/active/groups/(?P<group_id>\d+)/tasks/{lookup}/complete/$',
+            mapping={
+                'post': 'complete_active_group_task',
+            },
+            name='{basename}-detail',
+            initkwargs={'suffix': 'Detail'}
+        ),
+        Route(
             url=r'^{prefix}/completed/groups/(?P<group_id>\d+)/tasks/{lookup}/$',
             mapping={
                 'get': 'retrieve_completed_group_task',
