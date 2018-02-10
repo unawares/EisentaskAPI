@@ -13,6 +13,8 @@ from .serializers import GroupSerializer
 from .serializers import UsernameOrEmailSerializer
 from .paginations import GroupsSetPagination
 from .actions import GroupAdminActions
+from .exceptions import GroupAdminActionsError
+from .exceptions import GroupAdminActionsOnUserError
 
 # Create your views here.
 
@@ -43,8 +45,12 @@ class MyGroupViewSet(viewsets.ModelViewSet):
             Q(username=serializer.data['username_or_email'])
             | Q(email=serializer.data['username_or_email'])
         )
-        GroupAdminActions(admin, group).actions_with(user).add()
+        result = GroupAdminActions(admin, group).actions_with(user).add()
+        if not result.is_created():
+            raise GroupAdminActionsOnUserError('Member already exists.')
+        member_card = result.get_member_card()
         headers = self.get_success_headers(serializer.data)
+        serializer = MemberCardSerializer(member_card)
         return Response(serializer.data, headers=headers)
 
     @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
@@ -57,8 +63,9 @@ class MyGroupViewSet(viewsets.ModelViewSet):
             Q(username=serializer.data['username_or_email'])
             | Q(email=serializer.data['username_or_email'])
         )
-        GroupAdminActions(admin, group).actions_with(user).remove()
+        member_card = GroupAdminActions(admin, group).actions_with(user).remove().get_member_card()
         headers = self.get_success_headers(serializer.data)
+        serializer = MemberCardSerializer(member_card)
         return Response(serializer.data, headers=headers)
 
     @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
@@ -71,8 +78,9 @@ class MyGroupViewSet(viewsets.ModelViewSet):
             Q(username=serializer.data['username_or_email'])
             | Q(email=serializer.data['username_or_email'])
         )
-        GroupAdminActions(admin, group).actions_with(user).make_user_staff()
+        member_card = GroupAdminActions(admin, group).actions_with(user).make_user_staff().get_member_card()
         headers = self.get_success_headers(serializer.data)
+        serializer = MemberCardSerializer(member_card)
         return Response(serializer.data, headers=headers)
 
     @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
@@ -85,8 +93,9 @@ class MyGroupViewSet(viewsets.ModelViewSet):
             Q(username=serializer.data['username_or_email'])
             | Q(email=serializer.data['username_or_email'])
         )
-        GroupAdminActions(admin, group).actions_with(user).remove_staff_from_user()
+        member_card = GroupAdminActions(admin, group).actions_with(user).remove_staff_from_user().get_member_card()
         headers = self.get_success_headers(serializer.data)
+        serializer = MemberCardSerializer(member_card)
         return Response(serializer.data, headers=headers)
 
     @detail_route(methods=['post'], serializer_class=UsernameOrEmailSerializer)
@@ -99,8 +108,9 @@ class MyGroupViewSet(viewsets.ModelViewSet):
             Q(username=serializer.data['username_or_email'])
             | Q(email=serializer.data['username_or_email'])
         )
-        GroupAdminActions(admin, group).actions_with(user).give_admin_priviligies()
+        member_card = GroupAdminActions(admin, group).actions_with(user).give_admin_priviligies().get_member_card()
         headers = self.get_success_headers(serializer.data)
+        serializer = MemberCardSerializer(member_card)
         return Response(serializer.data, headers=headers)
 
 
@@ -112,6 +122,15 @@ class MyMemberCardViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(owner=self.request.user)
 
+    @detail_route(methods=['delete'])
+    def remove(self, request, pk=None):
+        member_card = get_object_or_404(self.get_queryset(), pk=pk)
+        if member_card.group.admin == member_card.owner:
+            raise GroupAdminActionsError('Admin of the group could not leave, please give your admin privileges to another person to leave')
+        serializer = self.get_serializer(member_card)
+        member_card.delete()
+        return Response(serializer.data)
+
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GroupSerializer
@@ -122,7 +141,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
         if self.request.user.is_authenticated:
             return self.queryset.filter(
                 Q(is_public=True) | Q(member_cards__owner=self.request.user)
-            )
+            ).distinct()
         else:
             return self.queryset.filter(is_public=True)
 

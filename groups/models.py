@@ -16,7 +16,7 @@ class Group(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ('created', 'updated',)
+        ordering = ('-created',)
 
 
 class MemberCard(models.Model):
@@ -30,4 +30,4 @@ class MemberCard(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     class Meta:
-        ordering = ('created', 'updated',)
+        ordering = ('-created',)

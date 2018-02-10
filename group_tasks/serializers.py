@@ -15,12 +15,13 @@ class GroupTaskSerializer(serializers.ModelSerializer):
     order = serializers.IntegerField(default=0)
     class Meta:
         model = GroupTask
-        exclude = ('shared_task', 'group',)
+        exclude = ('group',)
+        read_only_fields = ('shared_task',)
 
 
 class CompletedGroupTaskSerializer(serializers.ModelSerializer):
     text = serializers.CharField(source='shared_task.text')
     class Meta:
         model = CompletedGroupTask
-        exclude = ('shared_task', 'group', 'owner',)
-        read_only_fields = ('created', 'updated', 'priority',)
+        exclude = ('group', 'owner',)
+        read_only_fields = ('created', 'updated', 'priority', 'shared_task')

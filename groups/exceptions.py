@@ -2,15 +2,15 @@ from rest_framework.exceptions import APIException
 
 class GroupAdminActionsError(APIException):
     status_code = 400
-    default_detail = 'User has not admin privileges.'
-    default_code = 'access_denied'
+    default_detail = 'GroupAdminActionsError'
+    default_code = 'action_denied'
 
 class GroupAdminActionsOnUserError(APIException):
     status_code = 400
-    default_detail = 'User has admin privileges.'
-    default_code = 'access_denied'
+    default_detail = 'GroupAdminActionsOnUserError'
+    default_code = 'action_denied'
 
 class GroupAdminActionsNoMemberError(APIException):
     status_code = 400
-    default_detail = 'User must be member of the group.'
-    default_code = 'access_denied'
+    default_detail = 'GroupAdminActionsNoMemberError'
+    default_code = 'action_denied'

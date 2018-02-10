@@ -22,6 +22,7 @@ class MemberCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberCard
         fields = '__all__'
+        read_only_fields = ('is_staff',)
 
 
 class UsernameOrEmailSerializer(serializers.Serializer):

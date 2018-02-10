@@ -20,10 +20,13 @@ from .paginations import PrioritizedActiveTasksSetPagination
 # Create your views here.
 
 class GroupTasksViewSet(viewsets.GenericViewSet):
-    serializer_class = GroupTaskSerializer
+    active_task_serializer_class = GroupTaskSerializer
     completed_task_serializer_class = CompletedGroupTaskSerializer
     pagination_class = PrioritizedActiveTasksSetPagination
     queryset = GroupTask.objects.all()
+
+    def get_serializer_class(self):
+        return self.active_task_serializer_class
 
     def _get_group_instance(self, group_pk=None):
         if self.request.user.is_authenticated:
@@ -129,7 +132,7 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             self._get_queryset_active_group_tasks(group),
             pk=pk,
         )
-        serializer = self.serializer_class(active_group_task)
+        serializer = self.active_task_serializer_class(active_group_task)
         return Response(serializer.data)
 
     def update_active_group_task(self, request, group_id, pk):
@@ -142,7 +145,7 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             raise PermissionDenied({
                 'permission_denied': 'User is not permitted to create tasks.'
             })
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.active_task_serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         shared_task = SharedTask.objects.create(
             creator=member_card.owner,
@@ -158,7 +161,7 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
         group_task.priority = serializer.data['priority']
         group_task.save()
         group_task.to(serializer.data['order'])
-        serializer = self.serializer_class(group_task)
+        serializer = self.active_task_serializer_class(group_task)
         return Response(serializer.data)
 
     def delete_active_group_task(self, request, group_id, pk):
@@ -176,7 +179,7 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             pk=pk,
         )
         group_task.delete()
-        serializer = self.serializer_class(group_task)
+        serializer = self.active_task_serializer_class(group_task)
         return Response(serializer.data)
 
     def complete_active_group_task(self, request, group_id, pk):
@@ -186,9 +189,22 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             group=group,
         )
         group_task = GroupTask.objects.get(group=group, pk=pk)
+        shared_task = group_task.shared_task
+        if 'shared_task_id' in request.data:
+            try:
+                shared_task_id = int(request.data['shared_task_id'])
+                shared_task_wrapper = shared_task
+                while shared_task_wrapper.pk != shared_task_id:
+                    shared_task_wrapper = shared_task.previous
+                    if shared_task_wrapper is None:
+                        break
+                if shared_task_wrapper is not None:
+                    shared_task = shared_task_wrapper
+            except ValueError:
+                pass
         try:
             completed_group_task = CompletedGroupTask.objects.get(
-                shared_task=group_task.shared_task,
+                shared_task=shared_task,
                 group=group,
                 owner=self.request.user,
             )
@@ -196,7 +212,7 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             completed_group_task.save()
         except CompletedGroupTask.DoesNotExist:
             completed_group_task = CompletedGroupTask.objects.create(
-                shared_task=group_task.shared_task,
+                shared_task=shared_task,
                 group=group,
                 owner=self.request.user,
                 priority=group_task.priority,
@@ -239,7 +255,7 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             raise PermissionDenied({
                 'permission_denied': 'User is not permitted to create tasks.'
             })
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.active_task_serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         shared_task = SharedTask.objects.create(
             creator=member_card.owner,
@@ -251,5 +267,5 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             priority=serializer.data['priority'],
         )
         group_task.top()
-        serializer = self.serializer_class(group_task)
+        serializer = self.active_task_serializer_class(group_task)
         return Response(serializer.data)

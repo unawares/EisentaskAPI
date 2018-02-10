@@ -48,25 +48,25 @@ class GroupTasksRouter(SimpleRouter):
             initkwargs={'suffix': 'Detail'}
         ),
         Route(
-            url=r'^{prefix}/(?P<type>completed)/groups/(?P<group_id>\d+)/dates/$',
+            url=r'^{prefix}/completed/groups/(?P<group_id>\d+)/dates/$',
             mapping={'get': 'list_completed_task_dates'},
             name='{basename}-list-completed-tasks',
             initkwargs={'suffix': 'List'}
         ),
         Route(
-            url=r'^{prefix}/(?P<type>completed)/groups/(?P<group_id>\d+)/dates/(?P<year>\d+)/$',
+            url=r'^{prefix}/completed/groups/(?P<group_id>\d+)/dates/(?P<year>\d+)/$',
             mapping={'get': 'list_completed_task_dates'},
             name='{basename}-list-completed-tasks',
             initkwargs={'suffix': 'List'}
         ),
         Route(
-            url=r'^{prefix}/(?P<type>completed)/groups/(?P<group_id>\d+)/dates/(?P<year>\d+)/(?P<month>\d+)/$',
+            url=r'^{prefix}/completed/groups/(?P<group_id>\d+)/dates/(?P<year>\d+)/(?P<month>\d+)/$',
             mapping={'get': 'list_completed_task_dates'},
             name='{basename}-list-completed-tasks',
             initkwargs={'suffix': 'List'}
         ),
         Route(
-            url=r'^{prefix}/(?P<type>completed)/groups/(?P<group_id>\d+)/dates/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$',
+            url=r'^{prefix}/completed/groups/(?P<group_id>\d+)/dates/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$',
             mapping={'get': 'list_completed_task_dates'},
             name='{basename}-list-completed-tasks',
             initkwargs={'suffix': 'List'}

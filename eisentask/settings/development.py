@@ -11,7 +11,7 @@ settings = SettingsFile('../eisentask_config_dev.json')
 
 # Allowed hosts
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.43.29', 'localhost',]
 
 
 # Database
