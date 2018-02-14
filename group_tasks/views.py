@@ -15,6 +15,8 @@ from .models import CompletedGroupTask
 from .models import SharedTask
 from .serializers import GroupTaskSerializer
 from .serializers import CompletedGroupTaskSerializer
+from .serializers import GroupTaskOrderSerializer
+from .serializers import GroupTasksSelectionSerializer
 from .paginations import PrioritizedActiveTasksSetPagination
 
 # Create your views here.
@@ -96,6 +98,21 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    def list_by_date(self, request, *args, **kwargs):
+        group = self._get_group_instance(group_pk=kwargs['group_id'])
+        queryset = self._get_queryset_active_group_tasks(group)
+        year = None if 'year' not in kwargs else int(kwargs['year'])
+        month = None if 'month' not in kwargs else int(kwargs['month'])
+        day = None if 'day' not in kwargs else int(kwargs['day'])
+        if year is not None:
+            queryset = queryset.filter(created__year=year)
+        if month is not None:
+            queryset = queryset.filter(created__month=month)
+        if day is not None:
+            queryset = queryset.filter(created__day=day)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def list_completed_tasks(self, request, *args, **kwargs):
         self._query_params_validate(request.query_params)
         group = self._get_group_instance(group_pk=self.kwargs['group_id'])
@@ -125,6 +142,37 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
         if day is not None:
             results = [date for date in results if date.day == day]
         return Response(results)
+
+    def list_active_task_dates(self, request, *args, **kwargs):
+        group = self._get_group_instance(group_pk=self.kwargs['group_id'])
+        member_card = get_object_or_404(
+                                self.request.user.member_cards, group=group)
+        year = None if 'year' not in kwargs else int(kwargs['year'])
+        month = None if 'month' not in kwargs else int(kwargs['month'])
+        day = None if 'day' not in kwargs else int(kwargs['day'])
+        queryset = self._get_queryset_active_group_tasks(group)
+        results = queryset.values_list('created', flat=True)
+        if year is not None:
+            results = [date for date in results if date.year == year]
+        if month is not None:
+            results = [date for date in results if date.month == month]
+        if day is not None:
+            results = [date for date in results if date.day == day]
+        return Response(results)
+
+    def select_active_tasks(self, request, *args, **kwargs):
+        group = self._get_group_instance(group_pk=self.kwargs['group_id'])
+        member_card = get_object_or_404(
+                                self.request.user.member_cards, group=group)
+        queryset = self._get_queryset_active_group_tasks(group)
+        serializer = GroupTasksSelectionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer = GroupTaskSerializer(
+            queryset.filter(pk__in=serializer.data['ids']),
+            many=True,
+        )
+        return Response(serializer.data)
+
 
     def retrieve_active_group_task(self, request, group_id, pk):
         group = self._get_group_instance(group_id)
@@ -161,6 +209,37 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
         group_task.priority = serializer.data['priority']
         group_task.save()
         group_task.to(serializer.data['order'])
+        serializer = self.active_task_serializer_class(group_task)
+        return Response(serializer.data)
+
+    def update_active_group_task_order(self, request, group_id, pk):
+        group = self._get_group_instance(group_id)
+        member_card = get_object_or_404(
+            self.request.user.member_cards,
+            group=group,
+        )
+        if not member_card.is_staff:
+            raise PermissionDenied({
+                'permission_denied': 'User is not permitted to update tasks.'
+            })
+        serializer = GroupTaskOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        group_task = get_object_or_404(
+            self._get_queryset_active_group_tasks(group),
+            pk=pk,
+        )
+        if 'new_priority' in serializer.data and serializer.data['new_priority'] in (1, 2, 3, 4):
+            group_task.priority = serializer.data['new_priority']
+            group_task.save()
+        group_task_id_before = serializer.data['task_id_before']
+        if group_task_id_before != -1:
+            group_task_before = get_object_or_404(
+                self._get_queryset_active_group_tasks(group),
+                pk=group_task_id_before,
+            )
+            group_task.below(group_task_before)
+        else:
+            group_task.top()
         serializer = self.active_task_serializer_class(group_task)
         return Response(serializer.data)
 
@@ -266,6 +345,6 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             group=group,
             priority=serializer.data['priority'],
         )
-        group_task.top()
+        group_task.to(serializer.data['order'])
         serializer = self.active_task_serializer_class(group_task)
         return Response(serializer.data)

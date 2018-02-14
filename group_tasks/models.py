@@ -33,7 +33,10 @@ class GroupTask(OrderedModel):
                               related_name='group_tasks',
                               on_delete=models.CASCADE)
     priority = models.IntegerField(choices=PRIORITY_CHOICES)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
     order_with_respect_to = 'group'
+
 
     class Meta(OrderedModel.Meta):
         pass
