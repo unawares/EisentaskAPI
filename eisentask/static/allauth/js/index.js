@@ -1,9 +1,11 @@
+Vue.use(Vuetify)
+
 var app = new Vue({
   el: '#app',
   delimiters: ['[[', ']]'],
   data: {
     ready: false,
-    passwordVisibility: true,
+    passwordVisibility: false,
     login: '',
     username: '',
     password: '',

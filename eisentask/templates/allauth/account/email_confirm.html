@@ -2,21 +2,27 @@
 {% load static %}
 
 {% block content %}
-  <div class="text-white">
-    <h1>Confirm E-mail Address</h1>
-    {% if confirmation %}
-      {% with confirmation.email_address.user as user_display %}
-        <p>{% with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an e-mail address for user {{ user_display }}.{% endwith %}</p>
-        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
-          {% csrf_token %}
+  <div class="text-white" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div v-if="confirmEmail === 'not activated'">
+      <h1 class="text-center">Confirm E-mail Address</h1>
+      {% if confirmation %}
+        {% with confirmation.email_address.user as user_display %}
+          <p class="text-center">{% with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an e-mail address for user {{ user_display }}.{% endwith %}</p>
           <div class="text-center">
-            <input type="submit" class="button" value="CONFIRM"></input>
+            <v-btn color="blue" dark @click="confirmEmailAddress('{{ confirmation.key }}')">CONFIRM</v-btn>
+            {% csrf_token %}
           </div>
-        </form>
-      {% endwith %}
-    {% else %}
-      {% url 'account_email' as email_url %}
-      <p>This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new e-mail confirmation request</a>.</p>
-    {% endif %}
+        {% endwith %}
+      {% else %}
+        {% url 'account_email' as email_url %}
+        <p style="font-size: 20px">This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new e-mail confirmation request</a>.</p>
+      {% endif %}
+    </div>
+    <div v-else-if="confirmEmail === 'activated'">
+      <p style="font-size: 20px">This email has been verified</p>
+    </div>
+    <div v-else>
+      <p style="font-size: 20px">This e-mail confirmation link expired or is invalid</p>
+    </div>
   </div>
 {% endblock %}

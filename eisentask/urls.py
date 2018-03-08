@@ -14,8 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import re_path, path, include
 from django.views.generic import RedirectView
+from django.views.generic import TemplateView
+from django.contrib.auth.views import password_reset_confirm
+from django.contrib.auth.views import password_reset_complete
+from allauth.account.views import password_reset_from_key
 
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
@@ -32,6 +36,10 @@ api_patterns = [
 web_patterns = [
     path(r'', include('headpage.urls', namespace='headpage')),
     path(r'dashboard/', include('dashboard.urls', namespace='dashboard')),
+    re_path(r'accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+         password_reset_confirm,
+         name='password_reset_confirm'),
+    re_path(r'^reset/done/$', password_reset_complete, name='password_reset_complete'),
     path(r'accounts/', include('allauth.urls')),
 ]
 

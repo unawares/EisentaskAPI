@@ -4,17 +4,133 @@
 {% block head %}
   {{ block.super }}
   <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
-  <link href="{% static 'allauth/css/style.css' %}" rel="stylesheet" type="text/css">
+  <style>
+    body {
+      font-weight: 400;
+      padding: 0;
+      margin: 0;
+      background-color: #263238;
+      visibility: hidden;
+    }
+    .main {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+      justify-content: center;
+    }
+    .main .content {
+      width: 60vw;
+      max-width: 360px;
+      padding: 16px;
+    }
+    .main .content .spacer {
+      height: 16vw;
+      max-height: 20vh;
+    }
+    .main .content .authentication .auth {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+    .main .content .header .auth-tabs {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 12vw;
+      max-height: 80px;
+    }
+    .main .content .header .auth-tabs .auth-item {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      color: #ffc107;
+      display: inline-flex;
+      flex-grow: 1;
+      justify-content: center;
+      align-items: center;
+    }
+    .main .content .header .auth-tabs .auth-item a {
+      text-decoration: none;
+      color: inherit;
+      display: inline-flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+    .main .content .header .auth-tabs .auth-item:before {
+      -webkit-transition: all ease 200ms;
+      -moz-transition: all ease 200ms;
+      transition: all ease 200ms;
+      z-index: -1;
+      bottom: -120%;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: block;
+      content: "";
+      background-color: #ffc107;
+    }
+    .main .content .header .auth-tabs .auth-item.active {
+      color: #fff;
+    }
+    .main .content .header .auth-tabs .auth-item.active:before {
+      bottom: 0;
+    }
+    .main .content .header .auth-tabs:hover .auth-item {
+      color: #ffc107;
+    }
+    .main .content .header .auth-tabs:hover .auth-item:before {
+      bottom: -120%;
+    }
+    .main .content .header .auth-tabs .auth-item:hover {
+      color: #fff;
+    }
+    .main .content .header .auth-tabs .auth-item:hover:before {
+      bottom: 0;
+    }
+    .button {
+      color: #ffc107;
+      border: solid 2px #ffc107;
+      text-decoration: none;
+      padding: 8px 25px;
+      font-size: 2.5vw;
+      margin: 20px;
+      border-radius: 30px;
+      -webkit-transition: all ease-out 0.15s;
+      -moz-transition: all ease-out 0.15s;
+      transition: all ease-out 0.15s;
+      cursor: pointer;
+      display: inline-block;
+    }
+    @media screen and (min-width: 600px) {
+      .button {
+        font-size: 16px;
+      }
+    }
+    .button:hover {
+      background-color: #ffc107;
+      color: #fff;
+    }
+    .text-white {
+      color: #fff;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .text-end {
+      text-align: right;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
   <div id="app">
     <v-app style="background-color: inherit">
       <main class="main">
-        <div class="content">
-          <div class="spacer"></div>
-          {% block content %}{% endblock %}
-        </div>
+        {% block content %}{% endblock %}
       </main>
     </v-app>
   </div>
@@ -24,5 +140,65 @@
   {{ block.super }}
   <script src="https://unpkg.com/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
-  <script src="{% static 'allauth/js/index.js' %}"></script>
+  <script>
+    Vue.use(Vuetify)
+
+    var app = new Vue({
+      el: '#app',
+      delimiters: ['[[', ']]'],
+      data: {
+        ready: false,
+        passwordVisibility: false,
+        password1: '',
+        password2: '',
+        passwordFirstErrorMessages: [],
+        passwordSecondErrorMessages: [],
+        confirmEmail: 'not activated'
+      },
+      mounted () {
+        setTimeout(() => {
+          this.ready = true
+        }, 30)
+      },
+      watch: {
+        password1 () {
+          if (this.ready) {
+              this.passwordFirstErrorMessages = []
+          }
+        },
+
+        password2 () {
+          if (this.ready) {
+              this.passwordSecondErrorMessages = []
+          }
+        },
+
+        ready () {
+          if (this.ready) {
+            document.body.style.visibility = 'visible'
+          }
+        }
+      },
+      methods: {
+        getToken() {
+          return token = document.getElementsByName('csrfmiddlewaretoken')[0].value
+        },
+        confirmEmailAddress (key) {
+          var http = new XMLHttpRequest()
+          var url = window.location.pathname
+          var params = 'csrfmiddlewaretoken=' + this.getToken()
+          http.open("POST", url, true)
+          http.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+          http.onreadystatechange = () => {
+            if (http.readyState == 4 && http.status == 200) {
+              this.confirmEmail = 'activated'
+            } else {
+              this.confirmEmail = 'error'
+            }
+          }
+          http.send(params)
+        }
+      }
+    })
+  </script>
 {% endblock %}
