@@ -7,7 +7,7 @@ class Group(models.Model):
     admin = models.ForeignKey(get_user_model(),
                                 related_name='created_groups',
                                 on_delete=models.CASCADE)
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     is_public = models.BooleanField(default=False)
     is_joining_allowed = models.BooleanField(default=False)

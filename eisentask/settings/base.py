@@ -48,6 +48,10 @@ INSTALLED_APPS = [
     'tasks.completed',
     'group_tasks',
     'dashboard',
+#    'assignments',
+#    'assignments.private',
+#    'assignments.protected',
+#    'assignments.public',
     'headpage',
 ]
 
