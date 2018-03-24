@@ -26,6 +26,7 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 api_patterns = [
     path(r'tasks/', include('tasks.urls', namespace='tasks')),
     path(r'group_tasks/', include('group_tasks.urls', namespace='group_tasks')),
+    path(r'assignments/', include('assignments.urls', namespace='assignments')),
     path(r'groups/', include('groups.urls', namespace='groups')),
     path(r'auth/', include('rest_auth.urls')),
     path(r'auth/registration/', include('rest_auth.registration.urls')),
@@ -36,6 +37,7 @@ api_patterns = [
 web_patterns = [
     path(r'', include('headpage.urls', namespace='headpage')),
     path(r'dashboard/', include('dashboard.urls', namespace='dashboard')),
+    path(r'assignments/', include('assignments.protected.web_urls', namespace='assignments.protected_web')),
     re_path(r'accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
          password_reset_confirm,
          name='password_reset_confirm'),

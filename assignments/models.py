@@ -1,3 +1,4 @@
+import base64
 from django.db import models
 from django.contrib.auth import get_user_model
 from ordered_model.models import OrderedModel
@@ -6,26 +7,12 @@ from .strings import LABEL_GOALS, LABEL_PROGRESS, LABEL_ACTIVITIES, LABEL_INTERR
 
 # Create your models here.
 
-ACCESS_CHOICES = (
-    (1, LABEL_PRIVATE),
-    (2, LABEL_PROTECTED),
-    (3, LABEL_PUBLIC),
-)
-
-PRIORITY_CHOICES = (
-    (1, LABEL_GOALS),
-    (2, LABEL_PROGRESS),
-    (3, LABEL_ACTIVITIES),
-    (4, LABEL_INTERRUPTIONS),
-)
-
-STATE_CHOICES = (
-    (1, LABEL_ACTIVE),
-    (2, LABEL_COMPLETED),
-    (3, LABEL_DELETED),
-)
-
-class Assignments(models.Model):
+class Assignment(models.Model):
+    ACCESS_CHOICES = (
+        (1, LABEL_PRIVATE),
+        (2, LABEL_PROTECTED),
+        (3, LABEL_PUBLIC),
+    )
     uuid = models.CharField(max_length=32)
     creator = models.ForeignKey(get_user_model(),
                                 related_name='assignments',
@@ -33,43 +20,71 @@ class Assignments(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     access = models.IntegerField(choices=ACCESS_CHOICES)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
     _key = models.TextField(db_column='key')
     def key():
         def fget(self):
-            return base64.decodestring(self._key)
-        def fset(self, value):
-            self._key = base64.encodestring(key)
+            return base64.decodestring(str.encode(self._key, 'utf-8'))
+        def fset(self, key):
+            self._key = base64.encodestring(key).decode('utf-8')
         return locals()
     key = property(**key())
 
+    class Meta:
+        ordering = ('created', 'updated',)
 
-class AssignmentTasks(models.Model):
-    assignments = models.ForeignKey(Assignments,
-                                    related_name='assignment_tasks'
+
+class AssignmentTask(OrderedModel):
+    PRIORITY_CHOICES = (
+        (1, LABEL_GOALS),
+        (2, LABEL_PROGRESS),
+        (3, LABEL_ACTIVITIES),
+        (4, LABEL_INTERRUPTIONS),
+    )
+    text = models.TextField()
+    priority = models.IntegerField(choices=PRIORITY_CHOICES)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta(OrderedModel.Meta):
+        pass
+
+
+class AssignmentList(models.Model):
+    assignment = models.ForeignKey(Assignment,
+                                    related_name='assignment_lists',
                                     on_delete=models.CASCADE)
-    uuid = models.CharField(max_length=32)
-    goals = JSONField(default=[])
-    progress = JSONField(default=[])
-    activities = JSONField(default=[])
-    interruptions = JSONField(default=[])
-    previous_tasks = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
-    next_tasks = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    assignment_tasks = models.ManyToManyField(AssignmentTask,
+                                              related_name='assignment_lists')
+    next_list = models.OneToOneField('self',
+                                     related_name='previous_list',
+                                     on_delete=models.CASCADE,
+                                     null=True)
 
 
-"""
 class AssignmentProfile(models.Model):
-    assignment_tasks = models.ForeignKey(AssignmentTasks,
-                                         related_name='assignment_profiles'
-                                         on_delete=models.CASCADE)
-    email = models.EmailField(max_length=70)
-    uuid = models.CharField(max_length=32)
-    _key = models.TextField(db_column='key')
+    email = models.EmailField()
+    assignment_list = models.ForeignKey(AssignmentList,
+                                        related_name='assignment_profiles',
+                                        on_delete=models.CASCADE)
 
-    def key():
-        def fget(self):
-            return base64.decodestring(self._key)
-        def fset(self, value):
-            self._key = base64.encodestring(key)
-        return locals()
-    key = property(**key())
-"""
+
+class CompletedAssignmentTask(OrderedModel):
+    profile = models.ForeignKey(AssignmentProfile,
+                                related_name='completed_assignment_tasks',
+                                on_delete=models.CASCADE)
+    assignment_task = models.ForeignKey(AssignmentTask,
+                                        related_name='completed_assignment_tasks',
+                                        on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+
+class ArchivedAssignmentTask(OrderedModel):
+    profile = models.ForeignKey(AssignmentProfile,
+                                related_name='archived_assignment_tasks',
+                                on_delete=models.CASCADE)
+    assignment_task = models.ForeignKey(AssignmentTask,
+                                        related_name='archived_assignment_tasks',
+                                        on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
