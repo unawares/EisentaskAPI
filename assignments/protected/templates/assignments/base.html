@@ -1,0 +1,113 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block head %}
+  {{ block.super }}
+  {% comment %}
+    Main styles
+  {% endcomment %}
+  <style>
+    body {
+      background-color: #263238;
+      padding: 0;
+      margin: 0;
+    }
+    #app {
+      display: none;
+    }
+  </style>
+  {% comment %}
+    Header styles
+  {% endcomment %}
+  <style>
+    .header {
+      background-color: #455A64;
+    }
+    .header-container {
+      box-sizing: border-box;
+      display: flex;
+      align-items: flex-end;
+      align-content: space-around;
+      justify-content: center;
+      padding: 36px;
+      flex-wrap: wrap;
+    }
+    .menu-item {
+      position: relative;
+      flex-basis: 140px;
+      width: 0;
+      margin: 7px;
+    }
+    .menu-item.active .inner-item > .item-content {
+      color: #ffc107;
+      opacity: 1;
+    }
+    .inner-item {
+      padding-top: 110%;
+      position: relative;
+      cursor: pointer;
+    }
+    .inner-item > .item-background,
+    .inner-item > .item-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+    .inner-item > .item-background {
+      background-color: white;
+      border-radius: 3px;
+      opacity: 0.05;
+    }
+    .inner-item > .item-content {
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      opacity: 0.8;
+      padding: 10px;
+    }
+    .inner-item > .item-content > .item-icon {
+      margin-top: 30px;
+      font-size: 40px;
+      line-height: 50px;
+    }
+    .inner-item > .item-content > .title {
+      text-align: center;
+    }
+    .inner-item:hover > .item-background {
+      opacity: 0.1;
+    }
+    .inner-item:hover > .item-content {
+      opacity: 0.8 !important;
+    }
+  </style>
+  {% comment %}
+    Footer styles
+  {% endcomment %}
+  <style>
+    .footer {
+      height: 300px;
+      background-color: #455A64;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div id="app">
+    {% include "assignments/components/header.html" %}
+    {% block main %}{% endblock %}
+  </div>
+{% endblock %}
+
+{% block body_additions %}
+  {{ block.super }}
+  <script>
+    (function () {
+      var app = document.getElementById('app');
+      app.style.display = 'block';
+    })()
+  </script>
+{% endblock %}

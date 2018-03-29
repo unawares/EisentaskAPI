@@ -18,11 +18,12 @@ class AssignmentActions:
         NONE = 'none'
 
     @staticmethod
-    def new_assignment(creator, name, description, access=1):
+    def new_assignment(creator, name, description, label_color, access=1):
         assignment = Assignment(uuid=uuid4().hex,
                                 creator=creator,
                                 name=name,
                                 description=description,
+                                label_color=label_color,
                                 access=access)
         assignment.key = Fernet.generate_key()
         assignment.save()
@@ -57,7 +58,7 @@ class AssignmentActions:
                     elif task['action']  == AssignmentActions.ActionTypes.UPDATE.value:
                         assignment_task = self.assignment_list.assignment_tasks.get(pk=task['pk'])
                         assignment_list.assignment_tasks.remove(assignment_task)
-                        if len(assignment_task.assignment_lists.all()) == 1:
+                        if len(assignment_task.assignment_lists.all()) == 0:
                             assignment_task.delete()
                         assignment_list.assignment_tasks.add(
                             AssignmentTask.objects.create(
@@ -68,7 +69,7 @@ class AssignmentActions:
                     elif task['action']  == AssignmentActions.ActionTypes.DELETE.value:
                         assignment_task = self.assignment_list.assignment_tasks.get(pk=task['pk'])
                         assignment_list.assignment_tasks.remove(assignment_task)
-                        if len(assignment_task.assignment_lists.all()) == 1:
+                        if len(assignment_task.assignment_lists.all()) == 0:
                             assignment_task.delete()
                         continue
                     elif task['action']  == AssignmentActions.ActionTypes.NONE.value:

@@ -43,3 +43,9 @@ class TasksFormatValidator(object):
             elif task['action'] == action_types[3]:
                 if 'pk' not in task or type(task['pk']) is not int:
                     raise serializers.ValidationError("'pk' property must be set and must be integer type.")
+
+
+class TaskLabelColorRangeValidator(object):
+    def __call__(self, label_color):
+        if label_color < 1 or label_color > 4:
+            raise serializers.ValidationError('The value of label color must be one of the values: 1, 2, 3, 4.')

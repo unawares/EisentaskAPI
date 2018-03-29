@@ -13,6 +13,12 @@ class Assignment(models.Model):
         (2, LABEL_PROTECTED),
         (3, LABEL_PUBLIC),
     )
+    PRIORITY_CHOICES = (
+        (1, LABEL_GOALS),
+        (2, LABEL_PROGRESS),
+        (3, LABEL_ACTIVITIES),
+        (4, LABEL_INTERRUPTIONS),
+    )
     uuid = models.CharField(max_length=32)
     creator = models.ForeignKey(get_user_model(),
                                 related_name='assignments',
@@ -23,6 +29,8 @@ class Assignment(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     _key = models.TextField(db_column='key')
+    archived = models.BooleanField(default=False)
+    label_color = models.IntegerField(choices=PRIORITY_CHOICES)
     def key():
         def fget(self):
             return base64.decodestring(str.encode(self._key, 'utf-8'))

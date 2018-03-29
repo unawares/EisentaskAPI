@@ -7,7 +7,13 @@ from assignments.models import AssignmentProfile
 # Create your models here.
 
 class AssignmentInfo(models.Model):
-    assignment_profile = models.OneToOneField(
+    ACCESS_CHOICES = (
+        (1, 'EDIT'),
+        (2, 'VIEW'),
+    )
+    email = models.EmailField()
+    access = models.IntegerField(choices=ACCESS_CHOICES)
+    assignment_profile = models.ForeignKey(
         AssignmentProfile,
         related_name='assignment_infos',
         on_delete=models.CASCADE

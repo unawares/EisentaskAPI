@@ -28,6 +28,25 @@ DATABASES = {
     }
 }
 
+if DEBUG:
+    MIDDLEWARE_CLASSES += ['eisentask.middleware.QueryCountDebugMiddleware',]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    }
+}
 
 # Email
 

@@ -1,0 +1,24 @@
+{% url 'assignments.protected_web:active_tasks' uuid=assignment_info.uuid info=assignment_info.info|urlencode as active_tasks_url %}
+{% url 'assignments.protected_web:completed_tasks' uuid=assignment_info.uuid info=assignment_info.info|urlencode as completed_tasks_url %}
+<div class="header">
+  <div class="header-container">
+    <a href="{{ active_tasks_url }}" class="menu-item {% if section == 'active_tasks' %}active{% endif %}">
+      <div class="inner-item">
+        <div class="item-background"></div>
+        <div class="item-content">
+          <i class="material-icons item-icon">info_outline</i>
+          <span class="title">Active Tasks</span>
+        </div>
+      </div>
+    </a>
+    <a href="{{ completed_tasks_url }}" class="menu-item {% if section == 'completed_tasks' %}active{% endif %}">
+      <div class="inner-item">
+        <div class="item-background"></div>
+        <div class="item-content">
+          <i class="material-icons item-icon">done</i>
+          <span class="title">Completed Tasks</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,263 @@
+{% extends 'assignments/base.html' %}
+{% load static %}
+
+{% block head %}
+  {{ block.super }}
+  <style>
+    .main-container {
+      padding-bottom: 36px;
+      max-width: 1160px;
+      width: 90vw;
+      margin: 36px auto;
+      min-height: 700px;
+    }
+    .flex-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .flex-container > .flex-item {
+      flex-grow: 1;
+      flex-basis: 200px;
+      flex-shrink: 0;
+      max-width: 100%;
+      margin-top: 36px;
+      width: 0;
+    }
+    .flex-container > .flex-item:not(:first-of-type) {
+      padding-left: 10px;
+    }
+    .flex-container > .flex-item:not(:last-of-type) {
+      padding-right: 10px;
+    }
+    @media screen and (max-width: 960px) {
+      .flex-container > .flex-item {
+        flex-basis: 280px;
+      }
+      .flex-container > .flex-item:nth-child(2n-1) {
+        padding-right: 10px;
+        padding-left: 0px;
+      }
+      .flex-container > .flex-item:nth-child(2n) {
+        padding-right: 0px;
+        padding-left: 10px;
+      }
+      .flex-container > .flex-item:nth-child(3),
+      .flex-container > .flex-item:nth-child(4) {
+        margin-top: 0;
+      }
+    }
+    @media screen and (max-width: 645px) {
+      .flex-container > .flex-item:nth-child(2n-1),
+      .flex-container > .flex-item:nth-child(2n) {
+        padding-right: 36px;
+        padding-left: 36px;
+      }
+      .flex-container > .flex-item:nth-child(3),
+      .flex-container > .flex-item:nth-child(4) {
+        margin-top: 36px;
+      }
+    }
+
+    .card {
+      border-radius: 2px;
+      background-color: white;
+      width: 100%;
+    }
+    .card > *:first-child {
+      border-top-left-radius: 2px;
+      border-top-right-radius: 2px;
+    }
+    .card > .card-header {
+      color: white;
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .card > .card-header .title {
+      font-size: 18px;
+      font-weight: 400;
+    }
+    .card > .card-header .subtitle {
+      font-size: 12px;
+      font-weight: 400;
+    }
+    #goals .card-header {
+      background-color: #F44336;
+    }
+    #progress .card-header {
+      background-color: #0C73AF;
+    }
+    #activities .card-header {
+      background-color: #FF9F1C;
+    }
+    #interruptions .card-header {
+      background-color: #616161;
+    }
+
+    .tasks {
+      min-height: 160px;
+      padding: 16px;
+    }
+    .tasks > .task {
+      background-color: white;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .tasks > .task .task-text {
+      padding: 16px;
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(0, 0, 0, .87);
+      max-width: 100%;
+    }
+    .tasks > .task .task-text .text {
+      text-overflow: ellipsis;
+      white-space: pre-line;
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .tasks > .task .task-actions {
+      display: flex;
+      height: 36px;
+      padding: 8px 16px;
+      align-items: center;
+    }
+    .tasks > .task .task-actions > .action {
+      text-decoration: none;
+    }
+    #goals .tasks > .task .task-actions .action {
+      color: #F44336;
+    }
+    #progress .tasks > .task .task-actions .action {
+      color: #0C73AF;
+    }
+    #activities .tasks > .task .task-actions .action {
+      color: #FF9F1C;
+    }
+    #interruptions .tasks > .task .task-actions .action {
+      color: #616161;
+    }
+    .tasks > .task .task-actions .action:hover {
+      opacity: 0.7;
+    }
+
+    .shadow {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    .shadow.hoverable:hover {
+      box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    }
+    .spacer {
+      flex-grow: 1;
+    }
+    .clickable {
+      cursor: pointer;
+    }
+  </style>
+{% endblock %}
+
+{% block main %}
+  <div class="main-container flex-container">
+    <div class="flex-item">
+      <div id="goals" class="card list">
+        <div class="card-header">
+          <span class="title">GOALS</span>
+          <span class="subtitle">Important and urgent</span>
+        </div>
+        <div class="tasks">
+          {% for task in tasks.goals %}
+            {% url 'assignments.protected_web:complete_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as complete_task_url %}
+            {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
+            <div class="card task shadow">
+              <div class="task-text">
+                <span class="text">{{ task.text }}</span>
+              </div>
+              <div class="task-actions">
+                <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                <div class="spacer"></div>
+                <a href="{{ complete_task_url }}" class="material-icons action">done</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="flex-item">
+      <div id="progress" class="card">
+        <div class="card-header">
+          <span class="title">PROGRESS</span>
+          <span class="subtitle">Important and not urgent</span>
+        </div>
+        <div class="tasks shadow">
+          {% for task in tasks.progress %}
+            {% url 'assignments.protected_web:complete_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as complete_task_url %}
+            {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
+            <div class="card task shadow">
+              <div class="task-text">
+                <span class="text">{{ task.text }}</span>
+              </div>
+              <div class="task-actions">
+                <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                <div class="spacer"></div>
+                <a href="{{ complete_task_url }}" class="material-icons action">done</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="flex-item">
+      <div id="activities" class="card">
+        <div class="card-header">
+          <span class="title">ACTIVITIES</span>
+          <span class="subtitle">Not important and urgent</span>
+        </div>
+        <div class="tasks shadow">
+          {% for task in tasks.activities %}
+            {% url 'assignments.protected_web:complete_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as complete_task_url %}
+            {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
+            <div class="card task shadow">
+              <div class="task-text">
+                <span class="text">{{ task.text }}</span>
+              </div>
+              <div class="task-actions">
+                <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                <div class="spacer"></div>
+                <a href="{{ complete_task_url }}" class="material-icons action">done</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="flex-item">
+      <div id="interruptions" class="card">
+        <div class="card-header">
+          <span class="title">INTERRUPTIONS</span>
+          <span class="subtitle">Not important and not urgent</span>
+        </div>
+        <div class="tasks shadow">
+          {% for task in tasks.interruptions %}
+            {% url 'assignments.protected_web:complete_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as complete_task_url %}
+            {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
+            <div class="card task shadow">
+              <div class="task-text">
+                <span class="text">{{ task.text }}</span>
+              </div>
+              <div class="task-actions">
+                <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                <div class="spacer"></div>
+                <a href="{{ complete_task_url }}" class="material-icons action">done</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
