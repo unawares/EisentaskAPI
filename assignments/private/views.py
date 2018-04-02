@@ -73,6 +73,7 @@ class AssignmentViewSet(viewsets.ReadOnlyModelViewSet):
             if 'tasks' in serializer.data:
                 manager.override(serializer.data['tasks'])
             assignment_list = manager.get_assignment_list()
+            assignment_list.refresh_from_db()
         return Response(AssignmentListSerializer(assignment_list).data)
 
     @detail_route(methods=['delete'], serializer_class=TasksSerializer)

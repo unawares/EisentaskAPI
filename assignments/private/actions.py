@@ -7,6 +7,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from assignments.models import Assignment
 from assignments.models import AssignmentList
 from assignments.models import AssignmentTask
+from assignments.models import AssignmentProfile
 from .exceptions import AssignmentActionsError
 
 
@@ -43,55 +44,65 @@ class AssignmentActions:
             self.assignment_list = assignment_list
 
         def override(self, tasks):
+            order = 1
+            orders = {}
+            users = None
             assignment_list = AssignmentList.objects.create(assignment=self.assignment)
             if self.assignment_list:
-                assignment_list.assignment_tasks.add(*self.assignment_list.assignment_tasks.all())
+                users = self.assignment_list.assignment_profiles.all()
             for task in tasks:
                 try:
                     if task['action'] == AssignmentActions.ActionTypes.CREATE.value:
-                        assignment_list.assignment_tasks.add(
-                            AssignmentTask.objects.create(
-                                text=task['text'],
-                                priority=task['priority']
-                            )
+                        assignment_task = AssignmentTask.objects.create(
+                            text=task['text'],
+                            priority=task['priority']
                         )
+                        assignment_list.assignment_tasks.add(assignment_task)
+                        orders[assignment_task.pk] = order
+                        order += 1
                     elif task['action']  == AssignmentActions.ActionTypes.UPDATE.value:
-                        assignment_task = self.assignment_list.assignment_tasks.get(pk=task['pk'])
-                        assignment_list.assignment_tasks.remove(assignment_task)
-                        if len(assignment_task.assignment_lists.all()) == 0:
-                            assignment_task.delete()
-                        assignment_list.assignment_tasks.add(
-                            AssignmentTask.objects.create(
-                                text=task['text'],
-                                priority=task['priority']
-                            )
+                        t = self.assignment_list.assignment_tasks.get(pk=task['pk'])
+                        list_ids = t.assignment_lists.values_list('id', flat=True)
+                        profiles = AssignmentProfile.objects.filter(assignment_list__in=list_ids)
+                        if users is not None and len(profiles) == 0:
+                            t.delete()
+                        assignment_task = AssignmentTask.objects.create(
+                            text=task['text'],
+                            priority=task['priority']
                         )
+                        assignment_list.assignment_tasks.add(assignment_task)
+                        orders[assignment_task.pk] = order
+                        order += 1
                     elif task['action']  == AssignmentActions.ActionTypes.DELETE.value:
-                        assignment_task = self.assignment_list.assignment_tasks.get(pk=task['pk'])
-                        assignment_list.assignment_tasks.remove(assignment_task)
-                        if len(assignment_task.assignment_lists.all()) == 0:
-                            assignment_task.delete()
-                        continue
+                        t = self.assignment_list.assignment_tasks.get(pk=task['pk'])
+                        list_ids = t.assignment_lists.values_list('id', flat=True)
+                        profiles = AssignmentProfile.objects.filter(assignment_list__in=list_ids)
+                        if users is not None and len(profiles) == 0:
+                            t.delete()
                     elif task['action']  == AssignmentActions.ActionTypes.NONE.value:
-                        assignment_list.assignment_tasks.add(
-                            self.assignment_list.assignment_tasks.get(pk=task['pk'])
-                        )
+                        if users is None:
+                            continue
+                        assignment_task = self.assignment_list.assignment_tasks.get(pk=task['pk'])
+                        assignment_list.assignment_tasks.add(assignment_task)
+                        orders[assignment_task.pk] = order
+                        order += 1
                 except AssignmentTask.DoesNotExist:
                     pass
+            assignment_list.orders = orders
             assignment_list.save()
-            if self.assignment_list and len(self.assignment_list.assignment_profiles.all()) == 0:
+            if users is not None and len(users) == 0:
                 try:
                     previous_list = self.assignment_list.previous_list
-                    previous_list.next_list = assignment_task
+                    previous_list.next_list = assignment_list
                     previous_list.save()
                 except ObjectDoesNotExist:
+                    pass
+                finally:
                     self.assignment_list.delete()
-                    self.assignment_list = assignment_list
-            elif self.assignment_list:
+            elif users is not None:
                 self.assignment_list.next_list = assignment_list
                 self.assignment_list.save()
-            else:
-                self.assignment_list = assignment_list
+            self.assignment_list = assignment_list
 
         def get_assignment_list(self):
             return self.assignment_list

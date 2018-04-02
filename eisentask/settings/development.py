@@ -5,7 +5,6 @@ from .utils.stream import SettingsFile
 
 DEBUG = True
 
-
 settings = SettingsFile('../eisentask_config_dev.json')
 
 
@@ -28,9 +27,7 @@ DATABASES = {
     }
 }
 
-if DEBUG:
-    MIDDLEWARE_CLASSES += ['eisentask.middleware.QueryCountDebugMiddleware',]
-
+"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -47,6 +44,7 @@ LOGGING = {
         },
     }
 }
+"""
 
 # Email
 

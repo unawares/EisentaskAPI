@@ -24,6 +24,7 @@ from allauth.account.views import password_reset_from_key
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 api_patterns = [
+    path(r'profiles/', include('profiles.urls', namespace='profiles')),
     path(r'tasks/', include('tasks.urls', namespace='tasks')),
     path(r'group_tasks/', include('group_tasks.urls', namespace='group_tasks')),
     path(r'assignments/', include('assignments.urls', namespace='assignments')),

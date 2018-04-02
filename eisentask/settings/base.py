@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_auth',
     'rest_auth.registration',
     'ordered_model',
+    'profiles',
     'groups',
     'tasks',
     'tasks.active',

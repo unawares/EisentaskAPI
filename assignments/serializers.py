@@ -50,5 +50,5 @@ class AssignmentListSerializer(serializers.ModelSerializer):
     assignment_tasks = AssignmentTaskSerializer(read_only=True, many=True)
     class Meta:
         model = AssignmentList
-        fields = ('assignment', 'assignment_tasks', 'next_list',)
-        read_only_fields = ('assignment', 'assignment_tasks', 'next_list',)
+        fields = ('assignment', 'assignment_tasks', 'next_list', 'orders',)
+        read_only_fields = ('assignment', 'assignment_tasks', 'next_list', 'orders',)

@@ -96,7 +96,7 @@ def assign_to(request):
     if assignment.access == ACCESS_PRIVATE:
         assignment.access = ACCESS_PROTECTED
         assignment.save()
-    send_mass_mail(messages, fail_silently=False)
+    send_mass_mail(messages, fail_silently=True)
     return Response(serializer.data)
 
 

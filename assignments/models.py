@@ -1,7 +1,7 @@
 import base64
 from django.db import models
 from django.contrib.auth import get_user_model
-from ordered_model.models import OrderedModel
+from django.contrib.postgres.fields import JSONField
 from .strings import LABEL_PRIVATE, LABEL_PROTECTED, LABEL_PUBLIC
 from .strings import LABEL_GOALS, LABEL_PROGRESS, LABEL_ACTIVITIES, LABEL_INTERRUPTIONS
 
@@ -43,7 +43,7 @@ class Assignment(models.Model):
         ordering = ('created', 'updated',)
 
 
-class AssignmentTask(OrderedModel):
+class AssignmentTask(models.Model):
     PRIORITY_CHOICES = (
         (1, LABEL_GOALS),
         (2, LABEL_PROGRESS),
@@ -54,9 +54,6 @@ class AssignmentTask(OrderedModel):
     priority = models.IntegerField(choices=PRIORITY_CHOICES)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-
-    class Meta(OrderedModel.Meta):
-        pass
 
 
 class AssignmentList(models.Model):
@@ -69,6 +66,7 @@ class AssignmentList(models.Model):
                                      related_name='previous_list',
                                      on_delete=models.CASCADE,
                                      null=True)
+    orders = JSONField(default={})
 
 
 class AssignmentProfile(models.Model):
@@ -78,7 +76,7 @@ class AssignmentProfile(models.Model):
                                         on_delete=models.CASCADE)
 
 
-class CompletedAssignmentTask(OrderedModel):
+class CompletedAssignmentTask(models.Model):
     profile = models.ForeignKey(AssignmentProfile,
                                 related_name='completed_assignment_tasks',
                                 on_delete=models.CASCADE)
@@ -88,7 +86,7 @@ class CompletedAssignmentTask(OrderedModel):
     created = models.DateTimeField(auto_now_add=True)
 
 
-class ArchivedAssignmentTask(OrderedModel):
+class ArchivedAssignmentTask(models.Model):
     profile = models.ForeignKey(AssignmentProfile,
                                 related_name='archived_assignment_tasks',
                                 on_delete=models.CASCADE)

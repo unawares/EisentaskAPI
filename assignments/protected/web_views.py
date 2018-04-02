@@ -79,10 +79,10 @@ class Utils:
 def active_tasks_view(request, uuid, info):
     assignment, assignment_info = Utils.get_assignment_instances(uuid, parse.unquote(info))
     active_tasks_instance = Utils.get_active_tasks_instance(assignment_info)
-    goals = active_tasks_instance.filter(priority=1).order_by('order')
-    progress = active_tasks_instance.filter(priority=2).order_by('order')
-    activities = active_tasks_instance.filter(priority=3).order_by('order')
-    interruptions = active_tasks_instance.filter(priority=4).order_by('order')
+    goals = active_tasks_instance.filter(priority=1)
+    progress = active_tasks_instance.filter(priority=2)
+    activities = active_tasks_instance.filter(priority=3)
+    interruptions = active_tasks_instance.filter(priority=4)
     return render(request, 'assignments/active_tasks.html', {
         'assignment_info': {
             'email': assignment_info.email,
