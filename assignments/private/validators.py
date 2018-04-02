@@ -10,8 +10,8 @@ action_types = (
 
 class TasksFormatValidator(object):
     def __call__(self, tasks):
-        if len(tasks) > 100 or len(tasks) == 0:
-            raise serializers.ValidationError('Blank is not allowed and max amount of instances is 100')
+        if len(tasks) == 0:
+            raise serializers.ValidationError('Blank is not allowed')
         for task in tasks:
             if type(task) is not dict:
                 raise serializers.ValidationError('Instances must be a dict.')
