@@ -68,6 +68,7 @@ class AssignmentViewSet(viewsets.ReadOnlyModelViewSet):
             assignment.label_color = serializer.data['label_color']
         if 'access' in serializer.data:
             assignment.access = serializer.data['access']
+        assignment.archived = False
         assignment.save()
         with AssignmentActions(request.user, assignment) as manager:
             if 'tasks' in serializer.data:
