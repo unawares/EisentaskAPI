@@ -49,3 +49,9 @@ class TaskLabelColorRangeValidator(object):
     def __call__(self, label_color):
         if label_color < 1 or label_color > 4:
             raise serializers.ValidationError('The value of label color must be one of the values: 1, 2, 3, 4.')
+
+
+class TaskAccessRangeValidator(object):
+    def __call__(self, access):
+        if access < 1 or access > 3:
+            raise serializers.ValidationError('The value of access must be one of the values: 1, 2, 3, 4.')

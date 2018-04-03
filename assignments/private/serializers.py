@@ -3,6 +3,7 @@ from assignments.models import Assignment
 from assignments.models import AssignmentProfile
 from .validators import TasksFormatValidator
 from .validators import TaskLabelColorRangeValidator
+from .validators import TaskAccessRangeValidator
 
 class TasksSerializer(serializers.Serializer):
     tasks = serializers.ListField(
@@ -13,6 +14,10 @@ class TasksSerializer(serializers.Serializer):
     description = serializers.CharField()
     label_color = serializers.IntegerField(
         validators=[TaskLabelColorRangeValidator()]
+    )
+    access = serializers.IntegerField(
+        required=False,
+        validators=[TaskAccessRangeValidator()]
     )
 
 
@@ -27,6 +32,10 @@ class UpdateTasksSerializer(serializers.Serializer):
     label_color = serializers.IntegerField(
         required=False,
         validators=[TaskLabelColorRangeValidator()]
+    )
+    access = serializers.IntegerField(
+        required=False,
+        validators=[TaskAccessRangeValidator()]
     )
 
 

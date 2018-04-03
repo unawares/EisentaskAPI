@@ -58,6 +58,9 @@ class Utils:
 
     @staticmethod
     def get_assignment_instances(assignment_uuid_str, assignment_info_str):
+        ACCESS_PRIVATE = 1
+        ACCESS_PROTECTED = 2
+        ACCESS_PUBLIC = 3
         assignment = get_object_or_404(Assignment, uuid=assignment_uuid_str)
         info = None
         assignment_info = None
@@ -73,7 +76,15 @@ class Utils:
                 assignment_uuid=info['uuid'],
                 _assignment_info=base64.encodestring(assignment_info_str.encode('utf-8')).decode('utf-8')
             )
-        return assignment, assignment_info
+        if (
+            assignment.access == ACCESS_PRIVATE and assignment.creator.email == assignment_info.email
+        ) or (
+            assignment.access != ACCESS_PRIVATE
+        ):
+            return assignment, assignment_info
+        else:
+            raise Http404
+
 
 
 def active_tasks_view(request, uuid, info):
