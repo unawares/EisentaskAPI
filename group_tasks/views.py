@@ -44,20 +44,28 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
         if 'priority' in self.kwargs:
             active_group_tasks = active_group_tasks.filter(
                                             priority=self.kwargs['priority'])
-        if self.request.user.is_authenticated:
-            completed_shared_tasks = CompletedGroupTask.objects.filter(
-                owner=self.request.user,
-                group=group,
-            ).values_list('shared_task', flat=True)
-            active_group_tasks = active_group_tasks.exclude(
-                shared_task__in=completed_shared_tasks)
+        if group.flow == 1:
+            if self.request.user.is_authenticated:
+                completed_shared_tasks = CompletedGroupTask.objects.filter(
+                    owner=self.request.user,
+                    group=group,
+                ).values_list('shared_task', flat=True)
+        else:
+            if self.request.user.is_authenticated:
+                completed_shared_tasks = CompletedGroupTask.objects.filter(
+                    group=group
+                ).values_list('shared_task', flat=True)
+        active_group_tasks = active_group_tasks.exclude(
+            shared_task__in=completed_shared_tasks)
         return active_group_tasks
 
     def _get_queryset_completed_group_tasks(self, group=None):
-        return CompletedGroupTask.objects.filter(
-            owner=self.request.user,
-            group=group,
+        completed_group_tasks = CompletedGroupTask.objects.filter(
+            group=group
         )
+        if group.flow == 1:
+            completed_group_tasks = completed_group_tasks.filter(owner=self.request.user)
+        return completed_group_tasks
 
     def _query_params_validate(self, query_params):
         errors = { 'query_params': {} }
@@ -86,7 +94,6 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
             or 'month' in errors['query_params'] \
             or 'day' in errors['query_params']:
             raise ValidationError(errors)
-
 
     def list_by_priority(self, request, *args, **kwargs):
         group = self._get_group_instance(group_pk=kwargs['group_id'])

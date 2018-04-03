@@ -4,6 +4,10 @@ from django.contrib.auth import get_user_model
 # Create your models here.
 
 class Group(models.Model):
+    FLOW_CHOICES = (
+        (1, 'One For Each'),
+        (2, 'One For All'),
+    )
     admin = models.ForeignKey(get_user_model(),
                                 related_name='created_groups',
                                 on_delete=models.CASCADE)
@@ -14,6 +18,7 @@ class Group(models.Model):
     image = models.ImageField(upload_to='group_images/%Y/%m/%d', blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    flow = models.IntegerField(choices=FLOW_CHOICES, default=1)
 
     class Meta:
         ordering = ('-created',)

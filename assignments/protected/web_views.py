@@ -129,7 +129,6 @@ def completed_tasks_view(request, uuid, info):
                    ).order_by('created').values_list('assignment_task', flat=True)
         ) for key in dates
     }
-    print(filtered_tasks)
     return render(request, 'assignments/completed_tasks.html', {
         'assignment_info': {
             'uuid': assignment.uuid,
@@ -161,4 +160,17 @@ def archive_assigned_task(request, uuid, info, pk):
     task = get_object_or_404(Utils._get_all_tasks_instance(assignment_info), pk=pk)
     with AssignmentTaskActions(assignment, assignment_info) as action:
         action.archive_task(task)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def delete_assignment_profile(request, uuid, info, pk):
+    assignment, assignment_info = Utils.get_assignment_instances(uuid, parse.unquote(info))
+    if assignment_info.assignment_profile.email == assignment_info.email:
+        assignment_info.assignment_profile.delete()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def delete_assignment_info(request, uuid, info, pk):
+    assignment, assignment_info = Utils.get_assignment_instances(uuid, parse.unquote(info))
+    assignment_info.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
