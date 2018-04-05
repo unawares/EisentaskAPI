@@ -91,10 +91,12 @@ class Utils:
 def active_tasks_view(request, uuid, info):
     assignment, assignment_info = Utils.get_assignment_instances(uuid, parse.unquote(info))
     active_tasks_instance = Utils.get_active_tasks_instance(assignment_info)
-    goals = active_tasks_instance.filter(priority=1)
-    progress = active_tasks_instance.filter(priority=2)
-    activities = active_tasks_instance.filter(priority=3)
-    interruptions = active_tasks_instance.filter(priority=4)
+    orders = assignment_info.assignment_profile.assignment_list.orders
+    f = lambda task: orders[str(task.pk)]
+    goals = sorted(active_tasks_instance.filter(priority=1), key=f)
+    progress = sorted(active_tasks_instance.filter(priority=2), key=f)
+    activities = sorted(active_tasks_instance.filter(priority=3), key=f)
+    interruptions = sorted(active_tasks_instance.filter(priority=4), key=f)
     return render(request, 'assignments/active_tasks.html', {
         'is_owner': assignment_info.email == assignment_info.assignment_profile.email,
         'has_next_list': assignment_info.assignment_profile.assignment_list.next_list != None,

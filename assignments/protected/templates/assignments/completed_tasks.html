@@ -14,10 +14,14 @@
     }
 
     .completed-tasks-container {
-      max-width: 600px;
-      height: 700px;
       margin: auto;
     }
+    @media only screen and (max-width: 560px) {
+      .completed-tasks-container {
+        max-width: 400px;
+      }
+    }
+
     .list {
       margin-top: 36px;
     }
@@ -25,69 +29,44 @@
       font-size: 25px;
       color: white;
       padding: 10px 0;
-      border-bottom: solid 2px white;
-      display: flex;
-      align-items: center;
     }
-    .task-card {
-      margin-top: 16px;
-      display: flex;
-      background-color: white;
-      border-radius: 3px;
-    }
-    .task-card .colored-lable {
-      width: 10px;
-      border-top-left-radius: 3px;
-      border-bottom-left-radius: 3px;
-    }
-    .task-card .task {
-      flex-grow: 1;
-      padding: 16px 32px 16px 16px;
-    }
-    .task-card .task .task-text {
-      font-size: 20px;
+    .task {
       display: inline-block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: pre-line;
+      background: #fff;
+      margin: 0 0 1.5em;
+      width: 100%;
+      box-sizing: border-box;
     }
-    .task-card .task .task-actions {
-      height: 60px;
-      display: flex;
-      align-items: center;
+    .list-tasks {
+      margin: 1.5em 0;
+      padding: 0;
+      -moz-column-gap: 1.5em;
+      -webkit-column-gap: 1.5em;
+      column-gap: 1.5em;
+      font-size: .85em;
     }
-    .task-card .task .task-actions .action {
-      text-decoration: none;
+    @media only screen and (min-width: 560px) {
+      .list-tasks {
+        -moz-column-count: 2;
+        -webkit-column-count: 2;
+        column-count: 2;
+      }
     }
-    .task-card .task .task-actions .action:not(:first-of-type) {
-      margin-left: 16px;
+
+    @media only screen and (min-width: 700px) {
+      .list-tasks {
+        -moz-column-count: 3;
+        -webkit-column-count: 3;
+        column-count: 3;
+      }
     }
-    .task-card .task .task-actions .action:not(:last-of-type) {
-      margin-right: 16px;
-    }
-    .task-card.goals .task .task-actions .action {
-      color: #F44336;
-    }
-    .task-card.progress .task .task-actions .action {
-      color: #0C73AF;
-    }
-    .task-card.activities .task .task-actions .action {
-      color: #FF9F1C;
-    }
-    .task-card.interruptions .task .task-actions .action {
-      color: #616161;
-    }
-    .task-card.goals .colored-lable {
-      background-color: #F44336;
-    }
-    .task-card.progress .colored-lable {
-      background-color: #0C73AF;
-    }
-    .task-card.activities .colored-lable {
-      background-color: #FF9F1C;
-    }
-    .task-card.interruptions .colored-lable {
-      background-color: #616161;
+
+    @media only screen and (min-width: 900px) {
+      .list-tasks {
+        -moz-column-count: 4;
+        -webkit-column-count: 4;
+        column-count: 4;
+      }
     }
 
     .card {
@@ -98,6 +77,55 @@
     .card > *:first-child {
       border-top-left-radius: 2px;
       border-top-right-radius: 2px;
+    }
+    .card > *:last-child {
+      border-bottom-left-radius: 2px;
+      border-bottom-right-radius: 2px;
+    }
+
+    .task {
+      color: white;
+    }
+    .task .card-text {
+      padding: 1rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-line;
+    }
+    .task .card-actions {
+      display: flex;
+      padding: 10px 1rem;
+    }
+    .task .card-actions .action {
+      text-decoration: none;
+      color: white;
+    }
+    .task .card-actions .action:hover {
+      opacity: 0.8;
+    }
+    .task.goals .card-text {
+      background-color: #F44336;
+    }
+    .task.goals .card-actions {
+      background-color: #FF5742;
+    }
+    .task.progress .card-text {
+      background-color: #0C73AF;
+    }
+    .task.progress .card-actions {
+      background-color: #2185B7;
+    }
+    .task.activities .card-text {
+      background-color: #FF9F1C;
+    }
+    .task.activities .card-actions {
+      background-color: #FFB532;
+    }
+    .task.interruptions .card-text {
+      background-color: #616161;
+    }
+    .task.interruptions .card-actions {
+      background-color: #717171;
     }
 
     .shadow {
@@ -123,24 +151,17 @@
         <div class="list">
           <div class="list-header">
             <span class="date">{{ date | from_tuple_to_pretty_date }}</span>
-            <span class="spacer"></span>
-            <span>{{ list|length }}</span>
           </div>
           <div class="list-tasks">
             {% for task in list %}
               {% url 'assignments.protected_web:cancel_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as cancel_task_url %}
               {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
-              <div class="task-card {{ task.get_priority_display|lower }}">
-                <div class="colored-lable"></div>
-                <div class="task">
-                  <div class="task-text">
-                    <span>{{ task.text }}</span>
-                  </div>
-                  <div class="task-actions">
-                    <span class="spacer"></span>
-                    <a href="{{ cancel_task_url }}" class="material-icons action">remove_circle_outline</a>
-                    <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
-                  </div>
+              <div class="card task {{ task.get_priority_display|lower }}">
+                <div class="card-text">{{ task.text }}</div>
+                <div class="card-actions">
+                  <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                  <span class="spacer"></span>
+                  <a href="{{ cancel_task_url }}" class="material-icons action">remove_circle_outline</a>
                 </div>
               </div>
             {% endfor %}
