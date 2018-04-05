@@ -23,6 +23,7 @@
       max-width: 100%;
       margin-top: 36px;
       width: 0;
+      box-sizing: border-box;
     }
     .flex-container > .flex-item:not(:first-of-type) {
       padding-left: 10px;
@@ -30,7 +31,7 @@
     .flex-container > .flex-item:not(:last-of-type) {
       padding-right: 10px;
     }
-    @media screen and (max-width: 960px) {
+    @media screen and (max-width: 920px) {
       .flex-container > .flex-item {
         flex-basis: 280px;
       }
@@ -47,7 +48,7 @@
         margin-top: 16px;
       }
     }
-    @media screen and (max-width: 645px) {
+    @media screen and (max-width: 622px) {
       .flex-container > .flex-item:nth-child(2n-1),
       .flex-container > .flex-item:nth-child(2n) {
         padding-right: 36px;
