@@ -16,7 +16,6 @@ class TasksSerializer(serializers.Serializer):
         validators=[TaskLabelColorRangeValidator()]
     )
     access = serializers.IntegerField(
-        required=False,
         validators=[TaskAccessRangeValidator()]
     )
 

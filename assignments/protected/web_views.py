@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.views import View
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+from django.core.exceptions import ObjectDoesNotExist
 import base64
 import _pickle as pickle
 from urllib import parse
@@ -95,6 +96,8 @@ def active_tasks_view(request, uuid, info):
     activities = active_tasks_instance.filter(priority=3)
     interruptions = active_tasks_instance.filter(priority=4)
     return render(request, 'assignments/active_tasks.html', {
+        'is_owner': assignment_info.email == assignment_info.assignment_profile.email,
+        'has_next_list': assignment_info.assignment_profile.assignment_list.next_list != None,
         'assignment_info': {
             'email': assignment_info.email,
             'access': assignment_info.access,
@@ -163,14 +166,20 @@ def archive_assigned_task(request, uuid, info, pk):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def delete_assignment_profile(request, uuid, info, pk):
+def delete_assignment_profile(request, uuid, info):
     assignment, assignment_info = Utils.get_assignment_instances(uuid, parse.unquote(info))
     if assignment_info.assignment_profile.email == assignment_info.email:
         assignment_info.assignment_profile.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def delete_assignment_info(request, uuid, info, pk):
+def update_assignment_list(request, uuid, info):
     assignment, assignment_info = Utils.get_assignment_instances(uuid, parse.unquote(info))
-    assignment_info.delete()
+    if assignment_info.assignment_profile.email == assignment_info.email:
+        try:
+            assignment_profile = assignment_info.assignment_profile
+            assignment_profile.assignment_list = assignment.assignment_lists.get(next_list=None)
+            assignment_profile.save()
+        except ObjectDoesNotExist:
+            pass
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

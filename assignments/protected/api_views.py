@@ -21,8 +21,15 @@ from .serializers import RemoveAssignmentSerializer
 def get_assignment_message(email, assignment, assignment_info):
     return (
         assignment.name,
-        'http://localhost:8000/web/assignments/%s/%s/active-tasks/' % (assignment.uuid, parse.quote(assignment_info.assignment_info.decode('utf-8'))),
-        'from@example.com',
+        '%s\n\n%s\n\nLink: %s' % (
+            assignment.name,
+            assignment.description,
+            'http://localhost:8000/web/assignments/%s/%s/active-tasks/' % (
+                assignment.uuid,
+                parse.quote(assignment_info.assignment_info.decode('utf-8'))
+            )
+        ),
+        'Eisentask',
         [email],
     )
 

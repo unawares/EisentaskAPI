@@ -19,7 +19,7 @@ class AssignmentActions:
         NONE = 'none'
 
     @staticmethod
-    def new_assignment(creator, name, description, label_color, access=1):
+    def new_assignment(creator, name, description, label_color, access=2):
         assignment = Assignment(uuid=uuid4().hex,
                                 creator=creator,
                                 name=name,
@@ -66,10 +66,14 @@ class AssignmentActions:
                         profiles = AssignmentProfile.objects.filter(assignment_list__in=list_ids)
                         if users is not None and len(profiles) == 0:
                             t.delete()
-                        assignment_task = AssignmentTask.objects.create(
-                            text=task['text'],
-                            priority=task['priority']
-                        )
+                        assignment_task = None
+                        if t.text == task['text'] and t.priority == task['priority']:
+                            assignment_task = t
+                        else:
+                            assignment_task = AssignmentTask.objects.create(
+                                text=task['text'],
+                                priority=task['priority']
+                            )
                         assignment_list.assignment_tasks.add(assignment_task)
                         orders[assignment_task.pk] = order
                         order += 1

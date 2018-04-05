@@ -307,24 +307,26 @@ class GroupTasksViewSet(viewsets.GenericViewSet):
         return Response(serializer.data)
 
     def retrieve_completed_group_task(self, request, group_id, pk):
+        group = self._get_group_instance(group_id)
         member_card = get_object_or_404(
             self.request.user.member_cards,
-            group=group_id,
+            group=group,
         )
         completed_group_task = get_object_or_404(
-            self._get_queryset_completed_group_tasks(group_id),
+            self._get_queryset_completed_group_tasks(group),
             pk=pk,
         )
         serializer = self.completed_task_serializer_class(completed_group_task)
         return Response(serializer.data)
 
     def delete_completed_group_task(self, request, group_id, pk):
+        group = self._get_group_instance(group_id)
         member_card = get_object_or_404(
             self.request.user.member_cards,
-            group=group_id,
+            group=group,
         )
         completed_group_task = get_object_or_404(
-            self._get_queryset_completed_group_tasks(group_id),
+            self._get_queryset_completed_group_tasks(group),
             pk=pk,
         )
         completed_group_task.delete()

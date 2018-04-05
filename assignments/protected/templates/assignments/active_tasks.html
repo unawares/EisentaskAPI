@@ -58,6 +58,60 @@
       }
     }
 
+    .notifier-container {
+      background-color: #FFB532;
+    }
+    .notifier-container > .container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .notifier-container > .container > div {
+      padding-top: 16px;
+      padding-bottom: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .message-icon-button {
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border: 1.5px white solid;
+      border-radius: 3px;
+      margin: 10px 0;
+      transition: all ease 500ms;
+    }
+    .message-icon-button .icon {
+      display: inline-flex;
+      align-items: center;
+    }
+    .message-icon-button .text {
+      display: inline-flex;
+      align-items: center;
+      text-transform: uppercase;
+      padding-left: 7px;
+      padding-right: 5px;
+    }
+    .message-icon-button:hover {
+      background-color: white;
+      color: #FFB532;
+    }
+    .message-text {
+      margin: 0;
+    }
+    .message-text .text {
+      text-align: center;
+      color: white;
+      padding-left: 16px;
+      padding-right: 16px;
+      display: inline-block;
+    }
+
     .card {
       border-radius: 2px;
       background-color: white;
@@ -162,6 +216,23 @@
 {% endblock %}
 
 {% block main %}
+  {% if has_next_list %}
+  <div class="notifier-container">
+    <div class="container">
+      <div class="message">
+        <a href="{% url 'assignments.protected_web:update_assignment_list' uuid=assignment_info.uuid info=assignment_info.info|urlencode %}" class="message-icon-button">
+          <span class="icon">
+            <i class="material-icons action">cached</i>
+          </span>
+          <span class="text">update</span>
+        </a>
+        <p class="message-text">
+          <span class="text">This list has updates! Click the button to update.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
   <div class="main-container flex-container">
     <div class="flex-item">
       <div id="goals" class="card list">

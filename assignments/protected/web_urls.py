@@ -4,6 +4,7 @@ from .web_views import completed_tasks_view
 from .web_views import complete_assigned_task
 from .web_views import cancel_assigned_task
 from .web_views import archive_assigned_task
+from .web_views import update_assignment_list
 
 app_name = 'protected_assignments_web'
 urlpatterns = [
@@ -14,6 +15,9 @@ urlpatterns = [
             path(r'complete/', complete_assigned_task, name='complete_assigned_task'),
             path(r'cancel/', cancel_assigned_task, name='cancel_assigned_task'),
             path(r'archive/', archive_assigned_task, name='archive_assigned_task'),
+        ])),
+        path(r'action/', include([
+            path(r'update-list/', update_assignment_list, name='update_assignment_list'),
         ])),
     ])),
 ]
