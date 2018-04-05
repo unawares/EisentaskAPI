@@ -261,7 +261,7 @@
       <div class="message">
         <a href="{% url 'assignments.protected_web:update_assignment_list' uuid=assignment_info.uuid info=assignment_info.info|urlencode %}" class="message-icon-button">
           <span class="icon">
-            <i class="material-icons action">cached</i>
+            <i class="material-icons action notranslate">cached</i>
           </span>
           <span class="text">update</span>
         </a>
@@ -286,13 +286,13 @@
             <div class="card task shadow">
               <div class="task-text">
                 {% autoescape off %}
-                  <span class="text">{{ task.text|highlight_links }}</span>
+                  <span class="text notranslate">{{ task.text|highlight_links }}</span>
                 {% endautoescape %}
               </div>
               <div class="task-actions">
-                <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                <a href="{{ archive_task_url }}" class="material-icons action notranslate">delete</a>
                 <div class="spacer"></div>
-                <a href="{{ complete_task_url }}" class="material-icons action">done</a>
+                <a href="{{ complete_task_url }}" class="material-icons action notranslate">done</a>
               </div>
             </div>
           {% endfor %}
@@ -312,13 +312,13 @@
             <div class="card task shadow">
               <div class="task-text">
                 {% autoescape off %}
-                  <span class="text">{{ task.text|highlight_links }}</span>
+                  <span class="text notranslate">{{ task.text|highlight_links }}</span>
                 {% endautoescape %}
               </div>
               <div class="task-actions">
-                <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                <a href="{{ archive_task_url }}" class="material-icons action notranslate">delete</a>
                 <div class="spacer"></div>
-                <a href="{{ complete_task_url }}" class="material-icons action">done</a>
+                <a href="{{ complete_task_url }}" class="material-icons action notranslate">done</a>
               </div>
             </div>
           {% endfor %}
@@ -338,13 +338,13 @@
             <div class="card task shadow">
               <div class="task-text">
                 {% autoescape off %}
-                  <span class="text">{{ task.text|highlight_links }}</span>
+                  <span class="text notranslate">{{ task.text|highlight_links }}</span>
                 {% endautoescape %}
               </div>
               <div class="task-actions">
-                <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                <a href="{{ archive_task_url }}" class="material-icons action notranslate">delete</a>
                 <div class="spacer"></div>
-                <a href="{{ complete_task_url }}" class="material-icons action">done</a>
+                <a href="{{ complete_task_url }}" class="material-icons action notranslate">done</a>
               </div>
             </div>
           {% endfor %}
@@ -364,13 +364,13 @@
             <div class="card task shadow">
               <div class="task-text">
                 {% autoescape off %}
-                  <span class="text">{{ task.text|highlight_links }}</span>
+                  <span class="text notranslate">{{ task.text|highlight_links }}</span>
                 {% endautoescape %}
               </div>
               <div class="task-actions">
-                <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                <a href="{{ archive_task_url }}" class="material-icons action notranslate">delete</a>
                 <div class="spacer"></div>
-                <a href="{{ complete_task_url }}" class="material-icons action">done</a>
+                <a href="{{ complete_task_url }}" class="material-icons action notranslate">done</a>
               </div>
             </div>
           {% endfor %}

@@ -166,12 +166,12 @@
               {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
               <div class="card task {{ task.get_priority_display|lower }}">
                 {% autoescape off %}
-                  <div class="card-text">{{ task.text|highlight_links }}</div>
+                  <div class="card-text notranslate">{{ task.text|highlight_links }}</div>
                 {% endautoescape %}
                 <div class="card-actions">
-                  <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
+                  <a href="{{ archive_task_url }}" class="material-icons action notranslate">delete</a>
                   <span class="spacer"></span>
-                  <a href="{{ cancel_task_url }}" class="material-icons action">remove_circle_outline</a>
+                  <a href="{{ cancel_task_url }}" class="material-icons action notranslate">remove_circle_outline</a>
                 </div>
               </div>
             {% endfor %}
