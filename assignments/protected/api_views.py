@@ -3,6 +3,8 @@ from django.core.mail import send_mail
 from django.core.mail import send_mass_mail
 from django.http import Http404
 from django.db.models import Q
+from django.urls import reverse
+from django.contrib.sites.shortcuts import get_current_site
 from operator import and_, or_
 from functools import reduce
 import _pickle as pickle
@@ -18,18 +20,22 @@ from .models import AssignmentInfo
 from .serializers import AssignToSerializer
 from .serializers import RemoveAssignmentSerializer
 
-def get_assignment_message(email, assignment, assignment_info):
+def get_assignment_message(email, assignment, assignment_info, site):
+    path = reverse(
+        'assignments.protected_web:active_tasks',
+        args=[
+            assignment.uuid,
+            parse.quote(assignment_info.assignment_info.decode('utf-8'))
+        ]
+    )
     return (
         assignment.name,
-        '%s\n\n%s\n\nLink: %s' % (
+        '%s\n\n%s\n\nYour private link: %s\n\nDo not lose this link and do not share it.' % (
             assignment.name,
             assignment.description,
-            'http://localhost:8000/web/assignments/%s/%s/active-tasks/' % (
-                assignment.uuid,
-                parse.quote(assignment_info.assignment_info.decode('utf-8'))
-            )
+            'http://%s%s' % (site, path)
         ),
-        'Eisentask',
+        site,
         [email],
     )
 
@@ -99,7 +105,8 @@ def assign_to(request):
     AssignmentInfo.objects \
         .filter(assignment_profile=assignment_profile).delete()
     AssignmentInfo.objects.bulk_create(list(objects.values()))
-    messages = (get_assignment_message(email, assignment, objects[email]) for email in objects)
+    site = str(get_current_site(request))
+    messages = (get_assignment_message(email, assignment, objects[email], site) for email in objects)
     if assignment.access == ACCESS_PRIVATE:
         assignment.access = ACCESS_PROTECTED
         assignment.save()
