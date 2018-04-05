@@ -141,6 +141,14 @@
     .clickable {
       cursor: pointer;
     }
+
+    .link {
+      text-decoration: none;
+      color: #E8F967;
+    }
+    .link:hover {
+      opacity: 0.8;
+    }
   </style>
 {% endblock %}
 
@@ -157,7 +165,9 @@
               {% url 'assignments.protected_web:cancel_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as cancel_task_url %}
               {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
               <div class="card task {{ task.get_priority_display|lower }}">
-                <div class="card-text">{{ task.text }}</div>
+                {% autoescape off %}
+                  <div class="card-text">{{ task.text|highlight_links }}</div>
+                {% endautoescape %}
                 <div class="card-actions">
                   <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
                   <span class="spacer"></span>

@@ -1,5 +1,6 @@
 {% extends 'assignments/base.html' %}
 {% load static %}
+{% load poll_extras %}
 
 {% block head %}
   {{ block.super }}
@@ -216,6 +217,39 @@
     .clickable {
       cursor: pointer;
     }
+
+    .task.goals .card-text {
+      background-color: #F44336;
+    }
+    .task.goals .card-actions {
+      background-color: #FF5742;
+    }
+    .task.progress .card-text {
+      background-color: #0C73AF;
+    }
+    .task.progress .card-actions {
+      background-color: #2185B7;
+    }
+    .task.activities .card-text {
+      background-color: #FF9F1C;
+    }
+    .task.activities .card-actions {
+      background-color: #FFB532;
+    }
+    .task.interruptions .card-text {
+      background-color: #616161;
+    }
+    .task.interruptions .card-actions {
+      background-color: #717171;
+    }
+
+    .link {
+      text-decoration: none;
+      color: #2196F3;
+    }
+    .link:hover {
+      color: #F44336;
+    }
   </style>
 {% endblock %}
 
@@ -250,7 +284,9 @@
             {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
             <div class="card task shadow">
               <div class="task-text">
-                <span class="text">{{ task.text }}</span>
+                {% autoescape off %}
+                  <span class="text">{{ task.text|highlight_links }}</span>
+                {% endautoescape %}
               </div>
               <div class="task-actions">
                 <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
@@ -274,7 +310,9 @@
             {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
             <div class="card task shadow">
               <div class="task-text">
-                <span class="text">{{ task.text }}</span>
+                {% autoescape off %}
+                  <span class="text">{{ task.text|highlight_links }}</span>
+                {% endautoescape %}
               </div>
               <div class="task-actions">
                 <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
@@ -298,7 +336,9 @@
             {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
             <div class="card task shadow">
               <div class="task-text">
-                <span class="text">{{ task.text }}</span>
+                {% autoescape off %}
+                  <span class="text">{{ task.text|highlight_links }}</span>
+                {% endautoescape %}
               </div>
               <div class="task-actions">
                 <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
@@ -322,7 +362,9 @@
             {% url 'assignments.protected_web:archive_assigned_task' uuid=assignment_info.uuid info=assignment_info.info|urlencode pk=task.pk as archive_task_url %}
             <div class="card task shadow">
               <div class="task-text">
-                <span class="text">{{ task.text }}</span>
+                {% autoescape off %}
+                  <span class="text">{{ task.text|highlight_links }}</span>
+                {% endautoescape %}
               </div>
               <div class="task-actions">
                 <a href="{{ archive_task_url }}" class="material-icons action">delete</a>
