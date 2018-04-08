@@ -38,7 +38,10 @@ api_patterns = [
 web_patterns = [
     path(r'', include('headpage.urls', namespace='headpage')),
     path(r'dashboard/', include('dashboard.urls', namespace='dashboard')),
-    path(r'assignments/', include('assignments.protected.web_urls', namespace='assignments.protected_web')),
+    path(r'assignments/', include([
+        path(r'protected/', include('assignments.protected.web_urls', namespace='assignments.protected_web')),
+        path(r'public/', include('assignments.public.web_urls', namespace='assignments.public_web')),
+    ])),
     re_path(r'accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
          password_reset_confirm,
          name='password_reset_confirm'),
