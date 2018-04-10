@@ -421,6 +421,13 @@
       transform: translate(-50%, 0);
     }
 
+    .description-text {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-line;
+    }
+
     .link {
       text-decoration: none;
       color: #2196F3;
@@ -443,7 +450,7 @@
     </div>
     <div class="description">
       <div class="content-container">
-        <span class="text">{{ description }}</span>
+        <span class="description-text text">{{ description }}</span>
       </div>
     </div>
   </div>
